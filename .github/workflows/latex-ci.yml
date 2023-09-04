@@ -40,8 +40,6 @@ jobs:
 
       - name: Deploy PDF to GitHub Pages
         run: |
-          mkdir -p gh-pages
-          mv $GITHUB_WORKSPACE/resume.pdf gh-pages
           cd gh-pages
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
