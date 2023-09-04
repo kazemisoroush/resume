@@ -12,6 +12,13 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v3
 
+      - name: Replace placeholders in LaTeX document
+        run: |
+          PHONE_NUMBER="${{ secrets.PHONE_NUMBER }}"
+          EMAIL_ADDRESS="${{ secrets.EMAIL_ADDRESS }}"
+          sed -i "s/PHONE_NUMBER_PLACEHOLDER/$PHONE_NUMBER/g" resume.tex
+          sed -i "s/EMAIL_ADDRESS_PLACEHOLDER/$EMAIL_ADDRESS/g" resume.tex
+
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
@@ -43,3 +50,7 @@ jobs:
           git branch -M main
           git remote add origin "https://github.com/${{ github.repository }}.git"
           git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main:gh-pages
+
+env:
+  PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+  EMAIL: ${{ secrets.EMAIL }}
