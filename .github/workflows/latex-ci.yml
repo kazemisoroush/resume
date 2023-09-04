@@ -38,7 +38,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy PDF to GitHub Pages
+      - name: Create gh-pages directory
+        run: mkdir gh-pages
+
+      - name: Move PDF to gh-pages directory
+        run: mv $GITHUB_WORKSPACE/resume.pdf gh-pages/
+
+      - name: Configure Git and push to gh-pages branch
         run: |
           cd gh-pages
           git config user.name "${{ github.actor }}"
@@ -52,4 +58,4 @@ jobs:
 
 env:
   PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
-  EMAIL: ${{ secrets.EMAIL }}
+  EMAIL: ${{ secrets.EMAIL_ADDRESS }}
