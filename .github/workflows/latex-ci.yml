@@ -34,6 +34,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build_latex
+    env:
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -50,8 +53,8 @@ jobs:
       - name: Configure Git and push to gh-pages branch
         run: |
           cd gh-pages
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${GIT_USER_NAME}"
+          git config user.email "${GIT_USER_EMAIL}"
           git init
           git add .
           git commit -m "Update resume.pdf"
