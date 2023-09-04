@@ -16,8 +16,9 @@ jobs:
         run: |
           PHONE_NUMBER="${{ secrets.PHONE_NUMBER }}"
           EMAIL_ADDRESS="${{ secrets.EMAIL_ADDRESS }}"
-          sed -i "s/PHONE_NUMBER_PLACEHOLDER/$PHONE_NUMBER/g" resume.tex
-          sed -i "s/EMAIL_ADDRESS_PLACEHOLDER/$EMAIL_ADDRESS/g" resume.tex
+          sed "s/PHONE_NUMBER_PLACEHOLDER/$PHONE_NUMBER/g" resume.tex > resume_phone.tex
+          sed "s/EMAIL_ADDRESS_PLACEHOLDER/$EMAIL_ADDRESS/g" resume_phone.tex > resume_email.tex
+          mv resume_email.tex resume.tex
 
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
