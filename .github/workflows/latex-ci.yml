@@ -41,8 +41,11 @@ jobs:
       - name: Create gh-pages directory
         run: mkdir gh-pages
 
-      - name: Move PDF to gh-pages directory
-        run: mv $GITHUB_WORKSPACE/resume.pdf gh-pages/
+      - name: Download PDF from artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: PDF
+          path: ${{ github.workspace }}/gh-pages
 
       - name: Configure Git and push to gh-pages branch
         run: |
@@ -55,7 +58,3 @@ jobs:
           git branch -M main
           git remote add origin "https://github.com/${{ github.repository }}.git"
           git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main:gh-pages
-
-env:
-  PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
-  EMAIL: ${{ secrets.EMAIL_ADDRESS }}
