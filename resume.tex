@@ -1,0 +1,132 @@
+\documentclass[11pt, a4paper, sans]{moderncv}
+
+\moderncvstyle{classic}
+\moderncvcolor{grey}
+
+\pdfgentounicode=1
+
+\usepackage[scale=0.75]{geometry}
+\setlength{\hintscolumnwidth}{3.4cm}
+
+\firstname{Soroush}
+\familyname{Kazemi}
+
+\title{Curriculum Vitae}
+\address{}{Sydney, NSW 2155}
+\newcommand{\phoneNumber}{\process.env.PHONE_NUMBER}
+\newcommand{\emailAddress}{\process.env.EMAIL_ADDRESS}
+\mobile{\phoneNumber}
+\email{\emailAddress}
+\homepage{www.linkedin.com/in/kazemisoroush}{}
+%\quote{}
+
+\begin{document}
+
+    \makecvtitle
+
+
+    \section{Job Experience}\label{sec:job-experience}
+
+    \cventry
+    {Mar 2020 -- Present}
+    {Senior Software Engineer -- Team Lead}
+    {Evergen}
+    {Sydney}
+    {Australia}
+    {
+        \begin{itemize}
+            \item Mentoring other software engineers to foster their growth and skills
+            \item Actively practicing TDD and promoting its benefits within the team
+            \item Contributing to the development of automation especially CI/CD pipelines
+            \item Experience in writing infrastructure as code for various projects
+            \item Building and maintaining microservices within cloud-based environments, leveraging technologies such as AWS, Kubernetes, and Kafka
+        \end{itemize}
+    }
+
+    \cventry
+    {May 2019 -- Feb 2020}
+    {Senior Software Engineer}
+    {DriveYello}
+    {Sydney}
+    {Australia}
+    {
+        \begin{itemize}
+            \item Architected and designed API-focused software solutions
+            \item Developed user-facing elements and integrated with backend logic
+            \item Implemented efficient data storage solutions for optimal performance
+            \item Led continuous integration efforts for new product enhancements
+        \end{itemize}
+    }
+
+    \cventry
+    {Oct 2018 -- Apr 2019}
+    {Senior Software Engineer}
+    {Netbina}
+    {Tehran}
+    {Iran}
+    {
+        \begin{itemize}
+            \item Designing and implementing a microservice-based architecture
+            \item Developing and maintaining the core product features
+            \item Promoting tech best practices in the team: TDD, CI/CD, IaC
+            \item Documenting software applications for end-users and code base
+        \end{itemize}
+    }
+
+    \cventry
+    {Apr 2018 -- Oct 2018}
+    {Senior Software Engineer}
+    {SnappFood}
+    {Tehran}
+    {Iran}
+    {
+        \begin{itemize}
+            \item Developing, deploying, and maintaining the software features
+            \item Diagnosis and resolution of the cluster performance issue
+            \item Writing inclusive automated unit tests using PHPUnit package
+            \item Analyzing web server log to find the most common end-user searching behavior
+        \end{itemize}
+    }
+
+    \cventry
+    {Sep 2009 -- Apr 2018}
+    {Software Engineer}
+    {Saba System Sadra}
+    {Tehran}
+    {Iran}
+    {
+        \begin{itemize}
+            \item Design \& implemented an event management \& ticketing website that sold thousands of tickets every month
+            \item Taking advantage of cloud systems in order to enhance software scalability
+            \item Start learning by practice by using Node.js, Laravel, Vue.js, MongoDB, Docker Swarm as the tech stack
+            \item Documenting software applications for end-users and code base
+        \end{itemize}
+    }
+
+
+    \section{Education}\label{sec:education}
+
+    \cventry
+    {2014 -- 2017}
+    {Master of Science}
+    {Amirkabir University of Technology}
+    {Tehran}
+    {Iran}
+    {Thesis: Graph Partitioning Enhancement in Relational Cloud}
+
+    \cventry{2009 -- 2014}
+    {Bachelor of Science}
+    {Amirkabir University of Technology}
+    {Tehran}
+    {Iran}
+    {Thesis: Design \& Implementation of Scrum Based Project Management System}
+
+
+    \section{Certificates \& Awards}\label{sec:certificates-&-awards}
+
+    \cvitem{Feb 2022 -- Feb 2025}{\href{https://www.credly.com/badges/9589e04b-b950-49f7-a48d-71da0bd39536}{AWS Certified Solution Architect, Associate}}
+    \cvitem{Oct 2021}{\href{https://university.mongodb.com/certification/certificate/605484990}{MongoDB Certified Developer, Associate (C100DEV)}}
+    \cvitem{Feb 2014}{Rank 48 out of 23,116 candidates in Master's Entrance Exam.}
+    \cvitem{July 2009}{Rank 1212 out of 1,392,000 candidates in Bachelor's Entrance Exam.}
+
+\end{document}
