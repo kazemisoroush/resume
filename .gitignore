@@ -1,5 +1,5 @@
 # Ignore all files named "resume.*"
-resume.*
+resume*.*
 
 # But don't ignore .tex files
 !*.tex
