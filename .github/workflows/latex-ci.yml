@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PDF
-          path: resume.pdf
+          path: resume_replaced.pdf
 
       - name: Remove temporary files
         run: |
@@ -59,7 +59,7 @@ jobs:
           git config user.email "kazemisoroush@users.noreply.github.com"
           git init
           git add .
-          git commit -m "Update resume.pdf"
+          git commit -m "Update resume_replaced.pdf"
           git branch -M main
           git remote add origin "https://github.com/${{ github.repository }}.git"
           git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main:gh-pages
