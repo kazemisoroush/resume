@@ -19,20 +19,22 @@ jobs:
           sed "s/PHONE_NUMBER_PLACEHOLDER/$PHONE_NUMBER/g" resume.tex > resume_temp.tex
           sed "s/EMAIL_ADDRESS_PLACEHOLDER/$EMAIL_ADDRESS/g" resume_temp.tex > resume_replaced.tex
           rm -f resume_replaced.pdf
-          pdflatex -interaction=nonstopmode resume_replaced.tex 
-          rm -f resume_temp.tex
-          rm -f resume_replaced.tex
 
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: resume.tex
+          root_file: resume_replaced.tex
 
       - name: Upload PDF file
         uses: actions/upload-artifact@v3
         with:
           name: PDF
           path: resume.pdf
+
+      - name: Remove temporary files
+        run: |
+          rm -f resume_temp.tex
+          rm -f resume_replaced.tex
 
   deploy:
     runs-on: ubuntu-latest
