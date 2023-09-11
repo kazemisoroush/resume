@@ -46,6 +46,11 @@ jobs:
       - name: Create gh-pages directory
         run: mkdir gh-pages
 
+      - name: Set Git user name and email
+        run: |
+          git config user.name "kazemisoroush"
+          git config user.email "kazemisoroush@users.noreply.github.com"
+
       - name: Download PDF from artifacts
         uses: actions/download-artifact@v2
         with:
@@ -55,8 +60,6 @@ jobs:
       - name: Configure Git and push to gh-pages branch
         run: |
           cd gh-pages
-          git config user.name "kazemisoroush"
-          git config user.email "kazemisoroush@users.noreply.github.com"
           git init
           git add .
           git commit -m "Update resume_replaced.pdf"
