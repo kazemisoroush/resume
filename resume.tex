@@ -1,52 +1,70 @@
-\documentclass[11pt, a4paper, sans]{moderncv}
+\documentclass[12pt, a4paper, sans]{moderncv}
 
 \moderncvstyle{classic}
-\moderncvcolor{grey}
+\moderncvcolor{blue}
 
 \pdfgentounicode=1
 
-\usepackage[scale=0.75]{geometry}
-\setlength{\hintscolumnwidth}{3.4cm}
+\usepackage[scale=0.88]{geometry}
+\setlength{\hintscolumnwidth}{4cm}
+
+\renewcommand{\labelitemi}{$\bullet$}
+
+\renewcommand{\baselinestretch}{1.2}
 
 \firstname{Soroush}
 \familyname{Kazemi}
 
-\title{Curriculum Vitae}
-\address{}{Sydney, NSW}
-%\newcommand{\phoneNumber}{PHONE_NUMBER_PLACEHOLDER}
+\title{Senior Software Engineer - Lead}
+\address{}{Sydney, NSW 2155}
+\newcommand{\phoneNumber}{PHONE_NUMBER_PLACEHOLDER}
 \newcommand{\emailAddress}{EMAIL_ADDRESS_PLACEHOLDER}
-%\mobile{\phoneNumber}
-\email{\emailAddress}
-\homepage{www.linkedin.com/in/kazemisoroush}{}
-%\quote{}
+\newcommand{\homePage}{HOMEPAGE_PLACEHOLDER}
+
+\ifthenelse{\equal{\phoneNumber}{}}{}{\mobile{\phoneNumber}}
+\ifthenelse{\equal{\emailAddress}{}}{}{\email{\emailAddress}}
+\ifthenelse{\equal{\homePage}{}}{}{\homepage{\homePage}{}}
+\renewcommand*{\quotefont}{\small\slshape}
+
+\quote{
+    \begin{minipage}{\quotewidth}
+        \textit{
+            I am a passionate software engineer and lead with a keen eye for quality.
+            I believe in code as a craft but appreciate that code doesn’t exist in a vacuum.
+            I love delivering product features that customers want, improving business processes and making internal users’ lives easier.
+            I enjoy practicing TDD and pair programming and will always advocate for agility.
+        }
+    \end{minipage}
+}
 
 \begin{document}
 
     \makecvtitle
 
 
-    \section{Job Experience}\label{sec:job-experience}
+    \section{Experience}\label{sec:experience}
 
     \cventry
     {Mar 2020 -- Present}
     {Senior Software Engineer -- Team Lead}
-    {Evergen}
+    {\newline Evergen}
     {Sydney}
     {Australia}
     {
+        We built a platform that enables the orchestration of energy assets and did it so in a progressive, quality-driven way.
+        I am a team lead and a senior software engineer in the team for the past 1.5 years.
         \begin{itemize}
-            \item Mentoring other software engineers to foster their growth and skills
+            \item Building microservices using Golang, .Net Core, Orleans, TypeScript, and React using AWS, Kubernetes, and Kafka
+            \item Built teams, fostered a collaborative culture, and provided mentoring support.
             \item Actively practicing TDD and promoting its benefits within the team
             \item Contributing to the development of automation especially CI/CD pipelines
-            \item Experience in writing infrastructure as code for various projects
-            \item Building and maintaining microservices within cloud-based environments, leveraging technologies such as AWS, Kubernetes, and Kafka
         \end{itemize}
     }
 
     \cventry
     {May 2019 -- Feb 2020}
     {Senior Software Engineer}
-    {DriveYello}
+    {\newline DriveYello}
     {Sydney}
     {Australia}
     {
@@ -61,7 +79,7 @@
     \cventry
     {Oct 2018 -- Apr 2019}
     {Senior Software Engineer}
-    {Netbina}
+    {\newline Netbina}
     {Tehran}
     {Iran}
     {
@@ -76,7 +94,7 @@
     \cventry
     {Apr 2018 -- Oct 2018}
     {Senior Software Engineer}
-    {SnappFood}
+    {\newline SnappFood}
     {Tehran}
     {Iran}
     {
@@ -91,16 +109,23 @@
     \cventry
     {Sep 2009 -- Apr 2018}
     {Software Engineer}
-    {Saba System Sadra}
+    {\newline Saba System Sadra}
     {Tehran}
     {Iran}
     {
+%    itemise filled dot symbol instead
         \begin{itemize}
-            \item Design \& implemented an event management \& ticketing website that sold thousands of tickets every month
-            \item Taking advantage of cloud systems in order to enhance software scalability
-            \item Start learning by practice by using Node.js, Laravel, Vue.js, MongoDB, Docker Swarm as the tech stack
+            \item Designing and implementing a microservice-based architecture
+            \item Developing and maintaining the core product features
+            \item Promoting tech best practices in the team: TDD, CI/CD, IaC
             \item Documenting software applications for end-users and code base
         \end{itemize}
+%    \begin{itemize}
+%            \item Design \& implemented an event management \& ticketing website that sold thousands of tickets every month
+%            \item Taking advantage of cloud systems in order to enhance software scalability
+%            \item Start learning by practice by using Node.js, Laravel, Vue.js, MongoDB, Docker Swarm as the tech stack
+%            \item Documenting software applications for end-users and code base
+%        \end{itemize}
     }
 
 
@@ -129,4 +154,5 @@
     \cvitem{Feb 2014}{Rank 48 out of 23,116 candidates in Master's Entrance Exam.}
     \cvitem{July 2009}{Rank 1212 out of 1,392,000 candidates in Bachelor's Entrance Exam.}
 
+    \cvitem{Last Updated}{\today}
 \end{document}
