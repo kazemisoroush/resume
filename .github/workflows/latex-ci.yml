@@ -49,8 +49,8 @@ jobs:
 
       - name: Set Git user name and email
         run: |
-          git config user.name "kazemisoroush"
-          git config user.email "kazemisoroush@users.noreply.github.com"
+          git config user.name "${{ secrets.USER_NAME }}"
+          git config user.email "${{ secrets.EMAIL_ADDRESS }}"
 
       - name: Download PDF from artifacts
         uses: actions/download-artifact@v2
