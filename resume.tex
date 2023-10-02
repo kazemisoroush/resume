@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper, sans]{moderncv}
+\documentclass[14pt, a4paper, sans]{moderncv}
 
 \moderncvstyle{classic}
 \moderncvcolor{blue}
@@ -9,7 +9,7 @@
 \setlength{\hintscolumnwidth}{4cm}
 
 \renewcommand{\labelitemi}{$\bullet$}
-
+\renewcommand{\normalsize}{\fontsize{13}{16}\selectfont}
 \renewcommand{\baselinestretch}{1.2}
 
 \firstname{Soroush}
@@ -29,34 +29,40 @@
 \quote{
     \begin{minipage}{\quotewidth}
         \textit{
-            I am a passionate software engineer and lead with a keen eye for quality.
-            I believe in code as a craft but appreciate that code doesn’t exist in a vacuum.
-            I love delivering product features that customers want, improving business processes and making internal users’ lives easier.
-            I enjoy practicing TDD and pair programming and will always advocate for agility.
+            \fontsize{13}{16}\selectfont
+            As a passionate software engineer and lead, I have a strong focus on quality.
+            My goal is to provide customers with the features they desire, streamline business processes, and enhance the experiences of internal users.
+            I am a proponent of TDD and pair programming, and I prioritise agility in all my work.
         }
     \end{minipage}
 }
 
+            % I am a passionate software engineer and lead with a keen eye for quality.
+            % I love delivering product features that customers want, improving business processes and making internal users’ lives easier.
+            % I enjoy practising TDD and pair programming and will always advocate for agility.
+
+
 \begin{document}
 
     \makecvtitle
-
 
     \section{Experience}\label{sec:experience}
 
     \cventry
     {Mar 2020 -- Present}
     {Senior Software Engineer -- Team Lead}
-    {\newline Evergen}
-    {Sydney}
-    {Australia}
+    {\newline \textcolor{gray}{Evergen}}
+    {\textcolor{gray}{Sydney}}
+    {\textcolor{gray}{Australia}}
     {
-        We built a platform that enables the orchestration of energy assets and did it so in a progressive, quality-driven way.
-        I am a team lead and a senior software engineer in the team for the past 1.5 years.
+        \fontsize{13}{16}\selectfont
+        I am a key member of a team that designed an energy asset orchestration platform.
+        Our platform is engineered with a special emphasis on quality and reliability.
+        As the team lead and software engineer, I am contributing significantly to its development and ensuring that it meets our values \& high standards.
         \begin{itemize}
             \item Building microservices using Golang, .Net Core, Orleans, TypeScript, and React in AWS, Kubernetes, and Kafka
-            \item Built teams, fostered a collaborative culture, and provided mentoring support.
-            \item Actively practicing TDD and instrumentation to improve the quality of the platform.
+            \item Developing and leading teams, cultivated a collaborative corporate culture, and provided comprehensive mentoring support.
+            \item Actively practising TDD and instrumentation to improve the quality of the platform.
             \item Contributing to the development of automation especially CI/CD pipelines
         \end{itemize}
     }
@@ -64,12 +70,13 @@
     \cventry
     {May 2019 -- Feb 2020}
     {Senior Software Engineer}
-    {\newline DriveYello}
-    {Sydney}
-    {Australia}
+    {\newline \textcolor{gray}{DriveYello}}
+    {\textcolor{gray}{Sydney}}
+    {\textcolor{gray}{Australia}}
     {
+        \fontsize{13}{16}\selectfont
         We built new delivery feature based on parcels instead of shifts.
-        We improved the release process by practicing CI/CD.
+        We improved the release process by practising CI/CD.
         \begin{itemize}
             \item Built distributed system using Node.js, Golang in AWS and Kubernetes.
             \item Developed user-facing elements and integrated with backend logic.
@@ -81,10 +88,11 @@
     \cventry
     {Oct 2018 -- Apr 2019}
     {Senior Software Engineer}
-    {\newline Netbina}
-    {Tehran}
-    {Iran}
+    {\newline \textcolor{gray}{Netbina}}
+    {\textcolor{gray}{Tehran}}
+    {\textcolor{gray}{Iran}}
     {
+        \fontsize{13}{16}\selectfont
         We build a platform to help influencers to manage their social media accounts and conveniently follow brand trends and campaigns.
         Built it in a microservice-based architecture using PHP, Laravel, and Vue.js.
         We used Kubernetes and Docker to deploy the platform on Prem.
@@ -93,10 +101,11 @@
     \cventry
     {Apr 2018 -- Oct 2018}
     {Senior Software Engineer}
-    {\newline SnappFood}
-    {Tehran}
-    {Iran}
+    {\newline \textcolor{gray}{SnappFood}}
+    {\textcolor{gray}{Tehran}}
+    {\textcolor{gray}{Iran}}
     {
+        \fontsize{13}{16}\selectfont
         Built a new search engine that allowed searching for restaurants and food items amongst thousands of restaurants and millions of food items within user vicinity.
         We used ELK stack to build the search engine.
         Also Kubernetes and Docker to deploy the platform on prem.
@@ -105,10 +114,11 @@
     \cventry
     {Sep 2009 -- Apr 2018}
     {Software Engineer}
-    {\newline Saba System Sadra}
-    {Tehran}
-    {Iran}
+    {\newline \textcolor{gray}{Saba System Sadra}}
+    {\textcolor{gray}{Tehran}}
+    {\textcolor{gray}{Iran}}
     {
+        \fontsize{13}{16}\selectfont
         We built a Security Information and Event Management (SIEM) platform that helps organizations to detect and respond to cyber threats.
         We used PHP and Laravel to build the platform.
         Also, we used Elasticsearch, Logstash, and Kibana to build the SIEM engine.
@@ -119,26 +129,26 @@
 
     \cventry
     {2014 -- 2017}
-    {Master of Science}
+    {Master of Computer Network}
     {Amirkabir University of Technology}
     {Tehran}
     {Iran}
     {Thesis: Graph Partitioning Enhancement in Relational Cloud}
 
     \cventry{2009 -- 2014}
-    {Bachelor of Science}
+    {Bachelor of Information Technology}
     {Amirkabir University of Technology}
     {Tehran}
     {Iran}
     {Thesis: Design \& Implementation of Scrum Based Project Management System}
 
 
-    \section{Certificates \& Awards}\label{sec:certificates-&-awards}
+    \section{Certificates}\label{sec:certificates}
 
     \cvitem{Feb 2022 -- Feb 2025}{\href{https://www.credly.com/badges/9589e04b-b950-49f7-a48d-71da0bd39536}{AWS Certified Solution Architect, Associate}}
     \cvitem{Oct 2021}{\href{https://university.mongodb.com/certification/certificate/605484990}{MongoDB Certified Developer, Associate (C100DEV)}}
-    \cvitem{Feb 2014}{Rank 48 out of 23,116 candidates in Master's Entrance Exam.}
-    \cvitem{July 2009}{Rank 1212 out of 1,392,000 candidates in Bachelor's Entrance Exam.}
+    %\cvitem{Feb 2014}{Rank 48 out of 23,116 candidates in Master's Entrance Exam.}
+    %\cvitem{July 2009}{Rank 1212 out of 1,392,000 candidates in Bachelor's Entrance Exam.}
 
     \section{References}\label{sec:references}
     \cvitem{}{Available on request}
