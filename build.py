@@ -253,7 +253,7 @@ PRINT_CSS = """
   h1 { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-weight: 600; font-size: 25pt; line-height: 1; letter-spacing: -0.01em; margin: 0; }
   .role { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: #b0651a; margin: 6pt 0 0; font-weight: 500; }
   .contact { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; line-height: 1.7; color: #6a7180; text-align: right; }
-  .contact div a { color: #6a7180; text-decoration: none; }
+  .contact div a { color: #6a7180; text-decoration: underline; text-decoration-color: #bfc4cc; text-underline-offset: 2px; }
   .hr { height: 1.6pt; background: #b0651a; margin: 9pt 0 0; }
   .summary { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 10.5pt; line-height: 1.45; color: #3a4049; margin: 11pt 0 0; }
   section { margin-top: 13pt; }
