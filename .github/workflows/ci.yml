@@ -61,6 +61,7 @@ jobs:
           mkdir -p _site
           cp index.filled.html _site/index.html
           cp resume_replaced.pdf _site/resume.pdf
+          cp portrait.jpg _site/portrait.jpg
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
