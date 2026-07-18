@@ -27,40 +27,41 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # content.yaml is the single source of truth; render resume.tex + index.html.
-      - name: Generate sources from content.yaml
-        run: |
-          python3 -m pip install --quiet pyyaml
-          python3 build.py
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      # Contact details live only in repo settings (secrets/vars), never in the
-      # source. Fill the placeholders into both the PDF source and the web page.
-      # Any unset value renders blank.
-      - name: Inject contact details
+      # WeasyPrint needs pango/cairo system libs; IBM Plex gives consistent fonts.
+      - name: Install WeasyPrint and fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-ibm-plex
+          python3 -m pip install --quiet weasyprint pyyaml
+
+      # content.yaml is the single source of truth; render the site, the print
+      # document, and the PDF. Contact details come from repo secrets/vars at
+      # build time, never from the source; any unset value is omitted.
+      - name: Generate site and résumé PDF
         env:
           PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
           EMAIL_ADDRESS: ${{ vars.EMAIL_ADDRESS }}
           HOMEPAGE: ${{ vars.HOMEPAGE }}
-        run: |
-          for f in resume.tex index.html; do
-            sed -e "s|PHONE_NUMBER_PLACEHOLDER|${PHONE_NUMBER}|g" \
-                -e "s|EMAIL_ADDRESS_PLACEHOLDER|${EMAIL_ADDRESS}|g" \
-                -e "s|HOMEPAGE_PLACEHOLDER|${HOMEPAGE}|g" \
-                "$f" > "${f}.filled"
-          done
-          mv resume.tex.filled resume_replaced.tex
-          mv index.html.filled index.filled.html
+        run: python3 build.py
 
-      - name: Compile LaTeX document
-        uses: xu-cheng/latex-action@v3
+      # Downloadable on every run so the rendered PDF can be reviewed pre-merge.
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
         with:
-          root_file: resume_replaced.tex
+          name: resume-pdf
+          path: resume.pdf
+          if-no-files-found: error
 
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp index.filled.html _site/index.html
-          cp resume_replaced.pdf _site/resume.pdf
+          cp index.html _site/index.html
+          cp resume.pdf _site/resume.pdf
           cp portrait.jpg _site/portrait.jpg
 
       - name: Configure Pages
