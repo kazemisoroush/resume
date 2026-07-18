@@ -1,9 +1,11 @@
 # Generated outputs — the single source of truth is content.yaml (+ build.py).
 # Run `python build.py` to regenerate these locally.
-/resume.tex
 /index.html
+/resume-print.html
+/resume.pdf
 
-# LaTeX build artifacts
+# Legacy LaTeX artifacts (no longer used)
+/resume.tex
 resume_replaced.*
 *.aux
 *.log
