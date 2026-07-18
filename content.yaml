@@ -7,9 +7,11 @@ name: Soroush Kazemi
 title: Technology Leader            # shown under the name on the PDF
 eyebrow: Technology Leader · Cloud Platform Engineering   # small header line on the web page
 current: Senior Manager @ Macquarie Group                 # role line on the web page
+tagline: building the cloud control plane a whole company builds on.   # hero sub-line (after "<role> at <org> —")
 location: Sydney, NSW
 country: Australia
 github: https://github.com/kazemisoroush
+photo: portrait.jpg               # hero portrait on the web page (not used in the PDF)
 
 about:
   - >-
