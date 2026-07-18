@@ -1,41 +1,52 @@
 # Résumé
 
-LaTeX résumé built with [moderncv](https://ctan.org/pkg/moderncv). Contact
-details are kept out of the source via placeholders that get filled in at build
-time, so no personal phone/email lives in this repo.
+My résumé and portfolio, generated from a single source and published on every
+merge to `main`:
 
-## Build in CI
+- **PDF** — LaTeX ([moderncv](https://ctan.org/pkg/moderncv)) → `resume.pdf`
+- **Homepage** — a static site at **https://kazemisoroush.github.io/resume/**
 
-Every push to `main` runs `.github/workflows/latex-ci.yml`, which fills in the
-placeholders and compiles `resume.tex`. Download the compiled PDF from the
-workflow run's **Artifacts** (`resume-pdf`).
+## Single source of truth
 
-Configure these under repo **Settings → Secrets and variables → Actions**:
+Edit **`content.yaml`** only. [`build.py`](build.py) renders both `resume.tex`
+and `index.html` from it, so the PDF and the web page can never drift. Those two
+files are generated (git-ignored) — don't edit them by hand.
+
+Contact details are **not** in the content. The `PHONE_NUMBER` / `EMAIL_ADDRESS`
+/ `HOMEPAGE` placeholders are filled in at build time from repo settings, so no
+personal phone/email lives in the source. Any unset value renders blank.
+
+Configure under **Settings → Secrets and variables → Actions**:
 
 | Name | Kind | Example |
 |---|---|---|
-| `PHONE_NUMBER` | Secret | `04xx xxx xxx` |
-| `EMAIL_ADDRESS` | Secret | `you@example.com` |
+| `PHONE_NUMBER` | Secret | `04xx xxx xxx` (optional; omit to leave off the public PDF) |
+| `EMAIL_ADDRESS` | Variable | `you@example.com` |
 | `HOMEPAGE` | Variable | `www.linkedin.com/in/kazemisoroush` |
 
-Any placeholder left unset simply renders blank on the résumé.
+## How CI publishes
+
+`.github/workflows/latex-ci.yml` on every push to `main`:
+`build.py` (generate) → inject contact placeholders → compile PDF
+(`xu-cheng/latex-action`) → assemble `_site/` (homepage + `resume.pdf`) →
+deploy to GitHub Pages. Pull requests run the `build` job as a check but do not
+deploy.
 
 ## Build locally
 
-Set your details as environment variables, then compile:
-
 ```bash
-export PHONE_NUMBER="04xx xxx xxx"
-export EMAIL_ADDRESS="you@example.com"
-export HOMEPAGE="www.linkedin.com/in/kazemisoroush"
+python3 -m pip install pyyaml
+python3 build.py            # regenerates resume.tex and index.html
 
-sed -e "s|PHONE_NUMBER_PLACEHOLDER|${PHONE_NUMBER}|g" \
+# preview the PDF (contact fields render blank unless you set the vars first)
+export EMAIL_ADDRESS="you@example.com" HOMEPAGE="www.linkedin.com/in/kazemisoroush"
+sed -e "s|PHONE_NUMBER_PLACEHOLDER||g" \
     -e "s|EMAIL_ADDRESS_PLACEHOLDER|${EMAIL_ADDRESS}|g" \
     -e "s|HOMEPAGE_PLACEHOLDER|${HOMEPAGE}|g" \
     resume.tex > resume_replaced.tex
-
 pdflatex -interaction=nonstopmode resume_replaced.tex
-open resume_replaced.pdf   # macOS; use xdg-open on Linux
-```
+open resume_replaced.pdf   # macOS; xdg-open on Linux
 
-`resume_replaced.*` build outputs are git-ignored.
+# preview the homepage
+open index.html
+```
