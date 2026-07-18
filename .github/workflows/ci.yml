@@ -74,7 +74,7 @@ jobs:
 
   deploy:
     needs: build
-    # Only publish from main pushes — PRs run `build` as a check but never deploy.
+    # Only publish from main pushes. PRs run `build` as a check but never deploy.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:

@@ -186,8 +186,8 @@ def render_html(data, contact):
 
     p = ['<!DOCTYPE html>\n<html lang="en">\n<head>\n'
          '<meta charset="utf-8" />\n<meta name="viewport" content="width=device-width, initial-scale=1" />\n'
-         '<title>' + h(name) + ' — ' + h(title) + '</title>\n'
-         '<meta name="description" content="' + h(name) + ' — ' + h(title) + ', based in ' + h(data["location"]) + '. Résumé and portfolio." />\n'
+         '<title>' + h(name) + ', ' + h(title) + '</title>\n'
+         '<meta name="description" content="' + h(name) + ', ' + h(title) + ', based in ' + h(data["location"]) + '. Résumé and portfolio." />\n'
          '<style>' + SITE_CSS + '</style>\n</head>\n<body>\n']
     p.append('<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle colour theme"></button>\n\n')
     p.append('  <div class="wrap">\n')
@@ -195,7 +195,7 @@ def render_html(data, contact):
         '    <header class="hero">\n      <div class="hero-grid">\n        <div class="hero-text">\n'
         '          <p class="kicker anim d1">' + h(data["eyebrow"]) + '</p>\n'
         '          <h1 class="anim d1">' + h(name) + '</h1>\n'
-        '          <p class="subline anim d2"><b>' + h(exp0["role"]) + '</b> at ' + h(exp0["org"]) + ' — ' + h(data["tagline"]) + '</p>\n'
+        '          <p class="subline anim d2"><b>' + h(exp0["role"]) + '</b> at ' + h(exp0["org"]) + ', ' + h(data["tagline"]) + '</p>\n'
         '          <p class="meta-row anim d2">' + h(data["location"]) + ' · ' + h(data["country"]) + '</p>\n'
         '          <div class="actions anim d3">\n'
         '            <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Open PDF résumé ↗</a>\n'
@@ -211,9 +211,9 @@ def render_html(data, contact):
     for e in data["experience"]:
         place = h(e["city"]) + ", " + ccode(e["country"])
         if str(e["end"]).lower() == "present":
-            when = '<span class="now">' + h(e["start"]) + ' — Now</span><span class="place">' + place + '</span>'
+            when = '<span class="now">' + h(e["start"]) + ' - Now</span><span class="place">' + place + '</span>'
         else:
-            when = h(e["start"]) + ' — ' + h(e["end"]) + '<span class="place">' + place + '</span>'
+            when = h(e["start"]) + ' - ' + h(e["end"]) + '<span class="place">' + place + '</span>'
         p.append('\n      <div class="entry">\n        <div class="when">' + when + '</div>\n        <div class="what">\n'
                  '          <h3 class="role">' + h(e["role"]) + '</h3>\n'
                  '          <p class="org"><b>' + h(e["org"]) + '</b></p>\n'
@@ -233,7 +233,7 @@ def render_html(data, contact):
     p.append('      </div>\n    </section>\n\n')
     p.append('    <section>\n      <div class="rule-head"><span class="label">Education</span></div>\n      <div class="rows">\n')
     for ed in data["education"]:
-        p.append('        <div class="row">\n          <div class="k">' + h(ed["start"]) + ' — ' + h(ed["end"]) + '</div>\n'
+        p.append('        <div class="row">\n          <div class="k">' + h(ed["start"]) + ' - ' + h(ed["end"]) + '</div>\n'
                  '          <div class="v"><span class="deg">' + h(ed["degree"]) + '</span><br><span class="sub">' + h(ed["org"]) + ' · ' + h(ed["detail"]) + '</span></div>\n        </div>\n')
     p.append('      </div>\n    </section>\n\n')
     p.append('    <footer>\n      References available on request.\n    </footer>\n')
@@ -287,13 +287,14 @@ def render_print_html(data, contact):
     if contact["email"]:
         lines.append('<div><a href="mailto:' + h(contact["email"]) + '">' + h(contact["email"]) + '</a></div>')
     if contact["homepage"]:
-        lines.append('<div>' + h(strip_scheme(contact["homepage"])) + '</div>')
-    lines.append('<div>' + h(strip_scheme(data["github"])) + '</div>')
+        hp = strip_scheme(contact["homepage"])
+        lines.append('<div><a href="https://' + h(hp) + '">' + h(hp) + '</a></div>')
+    lines.append('<div><a href="' + h(data["github"]) + '">' + h(strip_scheme(data["github"])) + '</a></div>')
 
     summary = " ".join(data["about"])
 
     p = ['<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8" />\n'
-         '<title>' + h(name) + ' — Résumé</title>\n<style>' + PRINT_CSS + '</style>\n</head>\n<body>\n']
+         '<title>' + h(name) + ' , Résumé</title>\n<style>' + PRINT_CSS + '</style>\n</head>\n<body>\n']
     p.append('  <div class="top">\n    <div>\n      <h1>' + h(name) + '</h1>\n'
              '      <p class="role">' + h(data["eyebrow"]) + '</p>\n    </div>\n'
              '    <div class="contact">\n      ' + "\n      ".join(lines) + '\n    </div>\n  </div>\n'
@@ -304,9 +305,9 @@ def render_print_html(data, contact):
     for e in data["experience"]:
         loc = h(e["city"]) + ", " + ccode(e["country"])
         if str(e["end"]).lower() == "present":
-            when = '<span class="now">' + h(e["start"]) + ' — Now</span><span class="loc">' + loc + '</span>'
+            when = '<span class="now">' + h(e["start"]) + ' - Now</span><span class="loc">' + loc + '</span>'
         else:
-            when = h(e["start"]) + ' — ' + h(e["end"]) + '<span class="loc">' + loc + '</span>'
+            when = h(e["start"]) + ' - ' + h(e["end"]) + '<span class="loc">' + loc + '</span>'
         p.append('    <div class="entry">\n      <div class="when">' + when + '</div>\n      <div>\n'
                  '        <p class="role2">' + h(e["role"]) + '<span class="org">' + h(e["org"]) + '</span></p>\n'
                  '        <p class="sum">' + h(e["summary"]) + '</p>\n')
@@ -327,9 +328,9 @@ def render_print_html(data, contact):
 
     p.append('  <section>\n    <div class="slabel">Education</div>\n')
     for ed in data["education"]:
-        p.append('    <div class="kv"><div class="k">' + h(ed["start"]) + ' — ' + h(ed["end"]) + '</div>'
+        p.append('    <div class="kv"><div class="k">' + h(ed["start"]) + ' - ' + h(ed["end"]) + '</div>'
                  '<div class="v"><span class="deg">' + h(ed["degree"]) + '</span> '
-                 '<span class="sub">— ' + h(ed["org"]) + ' · ' + h(ed["detail"]) + '</span></div></div>\n')
+                 '<span class="sub">' + h(ed["org"]) + ' · ' + h(ed["detail"]) + '</span></div></div>\n')
     p.append('  </section>\n')
 
     p.append('</body>\n</html>\n')

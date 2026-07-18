@@ -3,8 +3,8 @@
 My résumé and portfolio, generated from a single source and published on every
 merge to `main`:
 
-- **Homepage** — a static site at **https://kazemisoroush.github.io/resume/**
-- **PDF** — an editorial print document at `/resume.pdf`
+- **Homepage**: a static site at **https://kazemisoroush.github.io/resume/**
+- **PDF**: an editorial print document at `/resume.pdf`
 
 ## Single source of truth
 
@@ -16,7 +16,7 @@ Edit **`content.yaml`** only. [`build.py`](build.py) renders everything from it:
 | `resume-print.html` | print-format document |
 | `resume.pdf` | rendered from `resume-print.html` via [WeasyPrint](https://weasyprint.org) |
 
-All three are generated (git-ignored) — don't edit them by hand. `portrait.jpg`
+All three are generated (git-ignored). Do not edit them by hand. `portrait.jpg`
 is the hero photo (web only; the PDF stays photo-free).
 
 Contact details are **not** in the content. `build.py` reads `PHONE_NUMBER` /
