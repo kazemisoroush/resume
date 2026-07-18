@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 # Least-privilege token, plus the scopes GitHub Pages deployment needs.
@@ -12,9 +15,9 @@ permissions:
   pages: write
   id-token: write
 
-# Never run two publishes at once; let the newest push win.
+# Serialise deploys per ref; a PR build never cancels a main deploy.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -63,6 +66,8 @@ jobs:
 
   deploy:
     needs: build
+    # Only publish from main pushes — PRs run `build` as a check but never deploy.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
