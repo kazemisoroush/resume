@@ -1,13 +1,13 @@
 # Single source of truth for the résumé.
-# Edit this file only — `build.py` renders both the PDF (resume.tex) and the
-# web page (index.html) from it. Contact details (phone/email/LinkedIn) are NOT
-# here; they are injected at build time from CI secrets/variables.
+# Edit this file only. `build.py` renders the web page (index.html) and the
+# PDF from it. Contact details (phone, email, LinkedIn) are NOT here. They are
+# read from the environment at build time.
 
 name: Soroush Kazemi
 title: Technology Leader            # shown under the name on the PDF
 eyebrow: Technology Leader · Cloud Platform Engineering   # small header line on the web page
 current: Senior Manager @ Macquarie Group                 # role line on the web page
-tagline: building the cloud control plane a whole company builds on.   # hero sub-line (after "<role> at <org> —")
+tagline: building the cloud control plane a whole company builds on.   # hero sub-line (after "<role> at <org>, ")
 location: Sydney, NSW
 country: Australia
 github: https://github.com/kazemisoroush
@@ -20,7 +20,7 @@ about:
     align with business goals.
   - >-
     I love delivering the product features customers want, improving business
-    processes, and making internal users' lives easier — practising strong
+    processes, and making internal users' lives easier. I practise strong
     engineering standards, pair programming, and agility.
 
 experience:
