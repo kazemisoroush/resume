@@ -1,0 +1,148 @@
+# Single source of truth for the résumé.
+# Edit this file only — `build.py` renders both the PDF (resume.tex) and the
+# web page (index.html) from it. Contact details (phone/email/LinkedIn) are NOT
+# here; they are injected at build time from CI secrets/variables.
+
+name: Soroush Kazemi
+title: Technology Leader            # shown under the name on the PDF
+eyebrow: Technology Leader · Cloud Platform Engineering   # small header line on the web page
+current: Senior Manager @ Macquarie Group                 # role line on the web page
+location: Sydney, NSW
+country: Australia
+github: https://github.com/kazemisoroush
+
+about:
+  - >-
+    A technology leader with extensive experience building scalable cloud
+    platforms, fostering collaboration, and driving engineering solutions that
+    align with business goals.
+  - >-
+    I love delivering the product features customers want, improving business
+    processes, and making internal users' lives easier — practising strong
+    engineering standards, pair programming, and agility.
+
+experience:
+  - role: Senior Manager
+    org: Macquarie Group
+    city: Sydney
+    country: Australia
+    start: Jan 2024
+    end: Present
+    summary: >-
+      Leading the development of a company-wide cloud control plane. Driving
+      engineering excellence through automation, CI/CD, and quality-driven
+      practices.
+    bullets:
+      - >-
+        Led the design and delivery of a company-wide cloud control plane,
+        enabling teams to self-serve AWS services through standardised, secure
+        abstractions with built-in governance, controls, and guardrails.
+      - >-
+        Owned and delivered a major cloud storage migration, replacing
+        on-premises infrastructure and reducing costs by tens of thousands of
+        dollars per month while improving scalability and resilience.
+      - >-
+        Established engineering standards and automation across CI/CD, testing,
+        and release pipelines, significantly improving delivery speed,
+        reliability, and operational consistency.
+      - >-
+        Mentored engineers and provided technical leadership across cloud
+        architecture, platform design, and operational best practices, lifting
+        overall team capability.
+    tech: .NET, Go, Python, AWS (EKS, FSx, Glue, Bedrock, Lambda, SQS, SNS), React, Crossplane, Argo, Terraform, GitHub, OTEL
+
+  - role: Lead Software Engineer
+    org: Evergen
+    city: Sydney
+    country: Australia
+    start: Mar 2020
+    end: Jan 2024
+    summary: >-
+      Designed and built an energy asset orchestration platform, focusing on
+      quality, reliability, and scalability. Led cross-functional teams to
+      deliver cloud-native solutions and fostered a collaborative team culture.
+    bullets:
+      - Built microservices in Golang, .NET Core, and React, deployed on AWS, Kubernetes, and Kafka.
+      - Implemented CI/CD pipelines and advanced instrumentation to streamline development and ensure platform reliability.
+      - Proposed and executed initiatives to improve onboarding, reducing time-to-productivity for new engineers by multiple factors.
+      - Mentored junior engineers, elevating team productivity and fostering a collaborative culture.
+    tech: Go, React, AWS (Lambda, ElastiCache, Athena, SageMaker), K8s, MongoDB, Bitbucket
+
+  - role: Senior Software Engineer
+    org: DriveYello
+    city: Sydney
+    country: Australia
+    start: May 2019
+    end: Feb 2020
+    summary: Contributed to the development of a last-mile delivery platform servicing B2B clients.
+    bullets:
+      - Developed backend features using PHP frameworks and Node.js to manage order workflows, delivery tracking, and vendor integrations.
+      - Maintained and deployed services on AWS using Docker containers, orchestrated with Rancher in production.
+      - Collaborated with cross-functional teams to improve system stability and streamline delivery processes, despite infrastructure limitations.
+    tech: PHP, Go, Node.js, AWS (Lambda, EKS), OTEL, Bitbucket
+
+  - role: Technical Team Lead
+    org: Netbina
+    city: Tehran
+    country: Iran
+    start: Oct 2018
+    end: Apr 2019
+    summary: >-
+      Led the development of sentiment analysis systems at a digital advertising
+      agency, enabling data-driven brand promotion across social media platforms.
+    bullets:
+      - Created a sentiment analysis pipeline using Laravel and MySQL, tailored for analysing social media content.
+      - Extracted insights from public conversations to support brand campaigns and digital marketing strategies.
+      - Delivered reliable, scalable backend solutions that empowered the marketing team to measure brand perception and improve targeting.
+    tech: PHP (Laravel), Go, Elasticsearch, K8s, Grafana, MySQL
+
+  - role: Senior Software Engineer
+    org: Snappfood
+    city: Tehran
+    country: Iran
+    start: Apr 2018
+    end: Oct 2018
+    summary: >-
+      Built a high-performance, index-based search engine for fast searches
+      across restaurants, food items, and grocery products. Designed and
+      implemented a scalable solution on Elasticsearch capable of handling
+      millions of entries, deployed on-prem with Kubernetes and Docker.
+    bullets: []
+    tech: null
+
+  - role: Software Engineer
+    org: Saba System Sadra
+    city: Tehran
+    country: Iran
+    start: Sep 2009
+    end: Apr 2018
+    summary: >-
+      Built a Security Information and Event Management (SIEM) platform that
+      helps organisations detect and respond to cyber threats. Application in
+      PHP and Laravel; SIEM engine on Elasticsearch, Logstash, and Kibana.
+    bullets: []
+    tech: null
+
+education:
+  - degree: Master of Science (M.Sc.)
+    org: Amirkabir University of Technology
+    city: Tehran
+    country: Iran
+    start: 2014
+    end: 2016
+    detail: Computer Systems Networking and Telecommunications
+  - degree: Bachelor of Science (B.Sc.)
+    org: Amirkabir University of Technology
+    city: Tehran
+    country: Iran
+    start: 2009
+    end: 2014
+    detail: Information Technology
+
+skills:
+  - label: Cloud & Platform
+    items: AWS (EKS, Lambda, Athena, Glue, Bedrock, FSx, SNS, SQS, MSK, OpenSearch), Kubernetes, Terraform, AWS CDK
+  - label: Automation & CI/CD
+    items: GitHub, Bitbucket, Argo, OpenTelemetry
+  - label: Programming
+    items: Go, Python, .NET, Node.js, React

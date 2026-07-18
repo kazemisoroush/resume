@@ -27,6 +27,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # content.yaml is the single source of truth; render resume.tex + index.html.
+      - name: Generate sources from content.yaml
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 build.py
+
       # Contact details live only in repo settings (secrets/vars), never in the
       # source. Fill the placeholders into both the PDF source and the web page.
       # Any unset value renders blank.

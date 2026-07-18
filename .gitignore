@@ -1,8 +1,16 @@
-# Ignore all files named "resume.*"
-resume*.*
+# Generated outputs — the single source of truth is content.yaml (+ build.py).
+# Run `python build.py` to regenerate these locally.
+/resume.tex
+/index.html
 
-# But don't ignore .tex files
-!*.tex
+# LaTeX build artifacts
+resume_replaced.*
+*.aux
+*.log
+*.out
 
-# Ignore all files in the .idea directory
+# Site assembly
+_site/
+
+# Editor
 .idea
