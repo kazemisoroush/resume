@@ -287,8 +287,9 @@ def render_print_html(data, contact):
     if contact["email"]:
         lines.append('<div><a href="mailto:' + h(contact["email"]) + '">' + h(contact["email"]) + '</a></div>')
     if contact["homepage"]:
-        lines.append('<div>' + h(strip_scheme(contact["homepage"])) + '</div>')
-    lines.append('<div>' + h(strip_scheme(data["github"])) + '</div>')
+        hp = strip_scheme(contact["homepage"])
+        lines.append('<div><a href="https://' + h(hp) + '">' + h(hp) + '</a></div>')
+    lines.append('<div><a href="' + h(data["github"]) + '">' + h(strip_scheme(data["github"])) + '</a></div>')
 
     summary = " ".join(data["about"])
 
