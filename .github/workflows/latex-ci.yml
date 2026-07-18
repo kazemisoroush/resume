@@ -4,66 +4,34 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build_latex:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Replace placeholders in LaTeX document
+        env:
+          PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          HOMEPAGE: ${{ vars.HOMEPAGE }}
         run: |
-          PHONE_NUMBER="${{ secrets.PHONE_NUMBER }}"
-          EMAIL_ADDRESS="${{ secrets.EMAIL_ADDRESS }}"
-          sed "s/PHONE_NUMBER_PLACEHOLDER/$PHONE_NUMBER/g" resume.tex > resume_1.tex
-          sed "s/HOMEPAGE_PLACEHOLDER/$HOMEPAGE/g" resume_1.tex > resume_2.tex
-          sed "s/EMAIL_ADDRESS_PLACEHOLDER/$EMAIL_ADDRESS/g" resume_2.tex > resume_replaced.tex
-          rm -f resume_replaced.pdf
+          sed -e "s|PHONE_NUMBER_PLACEHOLDER|${PHONE_NUMBER}|g" \
+              -e "s|EMAIL_ADDRESS_PLACEHOLDER|${EMAIL_ADDRESS}|g" \
+              -e "s|HOMEPAGE_PLACEHOLDER|${HOMEPAGE}|g" \
+              resume.tex > resume_replaced.tex
 
       - name: Compile LaTeX document
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v3
         with:
           root_file: resume_replaced.tex
 
       - name: Upload PDF file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: PDF
+          name: resume-pdf
           path: resume_replaced.pdf
-
-      - name: Remove temporary files
-        run: |
-          rm -f resume_temp.tex
-          rm -f resume_replaced.tex
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build_latex
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Create gh-pages directory
-        run: mkdir gh-pages
-
-      - name: Set Git user name and email
-        run: |
-          git config user.name "${{ secrets.USER_NAME }}"
-          git config user.email "${{ secrets.EMAIL_ADDRESS }}"
-
-      - name: Download PDF from artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: PDF
-          path: ${{ github.workspace }}/gh-pages
-
-      - name: Configure Git and push to gh-pages branch
-        run: |
-          cd gh-pages
-          git init
-          git add .
-          git commit -m "Update resume_replaced.pdf"
-          git branch -M main
-          git remote add origin "https://github.com/${{ github.repository }}.git"
-          git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main:gh-pages
+          if-no-files-found: error
