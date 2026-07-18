@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Soroush Kazemi — Senior Software Engineer &amp; Lead</title>
+<meta name="description" content="Soroush Kazemi — Senior Software Engineer and Team Lead based in Sydney. Résumé and portfolio." />
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e6e6e2;
+    --accent: #2f6f4f;
+    --accent-ink: #ffffff;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1211;
+      --surface: #171b19;
+      --ink: #ececec;
+      --muted: #9aa39e;
+      --line: #262c29;
+      --accent: #57b98a;
+      --accent-ink: #0f1211;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 30px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  header { padding: 72px 0 40px; border-bottom: 1px solid var(--line); }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; margin: 0 0 12px; }
+  h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.05; margin: 0 0 10px; letter-spacing: -0.02em; }
+  .role { font-size: 20px; color: var(--muted); margin: 0 0 4px; }
+  .place { color: var(--muted); margin: 0 0 28px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: var(--accent-ink);
+    padding: 11px 20px; border-radius: 999px; font-weight: 600; font-size: 15px;
+    box-shadow: var(--shadow);
+  }
+  .btn:hover { text-decoration: none; filter: brightness(1.05); }
+  .links { display: flex; flex-wrap: wrap; gap: 18px; font-size: 15px; }
+
+  /* Sections */
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 28px; font-weight: 700; }
+  .lead { font-size: 19px; line-height: 1.6; margin: 0; }
+
+  /* Timeline */
+  .entry { display: grid; grid-template-columns: 150px 1fr; gap: 8px 28px; margin-bottom: 34px; }
+  .entry:last-child { margin-bottom: 0; }
+  .when { color: var(--muted); font-size: 14px; padding-top: 3px; }
+  .what h3 { margin: 0; font-size: 18px; letter-spacing: -0.01em; }
+  .org { color: var(--muted); font-size: 15px; margin: 2px 0 10px; }
+  .what p { margin: 0 0 10px; }
+  .what ul { margin: 8px 0 0; padding-left: 18px; }
+  .what li { margin: 4px 0; }
+
+  .two { display: grid; grid-template-columns: 150px 1fr; gap: 8px 28px; }
+  .two + .two { margin-top: 20px; }
+
+  footer { padding: 40px 0 72px; color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 560px) {
+    .entry, .two { grid-template-columns: 1fr; gap: 2px; }
+    .when { padding-top: 0; }
+    header { padding-top: 52px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Senior Software Engineer · Lead</p>
+      <h1>Soroush Kazemi</h1>
+      <p class="role">Senior Software Engineer &amp; Team Lead</p>
+      <p class="place">Sydney, NSW · Australia</p>
+      <div class="actions">
+        <a class="btn" href="resume.pdf" download>↓ Download PDF résumé</a>
+        <div class="links">
+          <a href="https://github.com/kazemisoroush">GitHub</a>
+          <a href="https://HOMEPAGE_PLACEHOLDER">LinkedIn</a>
+          <a href="mailto:EMAIL_ADDRESS_PLACEHOLDER">Email</a>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <h2>About</h2>
+      <p class="lead">
+        Software engineer and team lead with a strong focus on quality. I ship the
+        features customers want, streamline business processes, and make internal
+        tools easier to use. A firm advocate of TDD, pair programming, and agility.
+      </p>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+
+      <div class="entry">
+        <div class="when">Mar 2020 — Present</div>
+        <div class="what">
+          <h3>Senior Software Engineer — Team Lead</h3>
+          <div class="org">Evergen · Sydney, Australia</div>
+          <p>Lead engineer on an energy asset orchestration platform built for quality and reliability. I drive its design and delivery while mentoring the team and upholding our engineering standards.</p>
+          <ul>
+            <li>Building microservices in Go, .NET Core, Orleans, TypeScript, and React on AWS, Kubernetes, and Kafka.</li>
+            <li>Leading and mentoring engineers, and fostering a collaborative team culture.</li>
+            <li>Practising TDD and instrumentation to raise platform quality.</li>
+            <li>Building automation, with a focus on CI/CD pipelines.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="when">May 2019 — Feb 2020</div>
+        <div class="what">
+          <h3>Senior Software Engineer</h3>
+          <div class="org">DriveYello · Sydney, Australia</div>
+          <p>Built a new parcel-based delivery model to replace the shift-based one, and improved the release process through CI/CD.</p>
+          <ul>
+            <li>Built distributed systems in Node.js and Go on AWS and Kubernetes.</li>
+            <li>Developed user-facing features and integrated them with backend services.</li>
+            <li>Implemented efficient data storage for optimal performance.</li>
+            <li>Led CI/CD efforts for new product enhancements.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="when">Oct 2018 — Apr 2019</div>
+        <div class="what">
+          <h3>Senior Software Engineer</h3>
+          <div class="org">Netbina · Tehran, Iran</div>
+          <p>Built a platform for influencers to manage their social accounts and track brand trends and campaigns. Microservice architecture in PHP, Laravel, and Vue.js, deployed on-prem with Docker and Kubernetes.</p>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="when">Apr 2018 — Oct 2018</div>
+        <div class="what">
+          <h3>Senior Software Engineer</h3>
+          <div class="org">SnappFood · Tehran, Iran</div>
+          <p>Built a search engine for finding restaurants and food items — across thousands of restaurants and millions of items — within a user's vicinity. Powered by the ELK stack, deployed on-prem with Docker and Kubernetes.</p>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="when">Sep 2009 — Apr 2018</div>
+        <div class="what">
+          <h3>Software Engineer</h3>
+          <div class="org">Saba System Sadra · Tehran, Iran</div>
+          <p>Built a Security Information and Event Management (SIEM) platform that helps organisations detect and respond to cyber threats. Application in PHP and Laravel; SIEM engine on Elasticsearch, Logstash, and Kibana.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      <div class="two">
+        <div class="when">2014 — 2017</div>
+        <div class="what">
+          <h3>Master of Computer Network</h3>
+          <div class="org">Amirkabir University of Technology · Tehran, Iran</div>
+          <p>Thesis: Graph Partitioning Enhancement in Relational Cloud.</p>
+        </div>
+      </div>
+      <div class="two">
+        <div class="when">2009 — 2014</div>
+        <div class="what">
+          <h3>Bachelor of Information Technology</h3>
+          <div class="org">Amirkabir University of Technology · Tehran, Iran</div>
+          <p>Thesis: Design &amp; Implementation of a Scrum-Based Project Management System.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Certificates</h2>
+      <div class="two">
+        <div class="when">Feb 2022 — Feb 2025</div>
+        <div class="what">
+          <h3><a href="https://www.credly.com/badges/9589e04b-b950-49f7-a48d-71da0bd39536">AWS Certified Solutions Architect — Associate</a></h3>
+        </div>
+      </div>
+      <div class="two">
+        <div class="when">Oct 2021</div>
+        <div class="what">
+          <h3><a href="https://university.mongodb.com/certification/certificate/605484990">MongoDB Certified Developer — Associate (C100DEV)</a></h3>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      References available on request. · Built from
+      <a href="https://github.com/kazemisoroush/resume">kazemisoroush/resume</a>,
+      published automatically on every merge to <code>main</code>.
+    </footer>
+  </div>
+</body>
+</html>
