@@ -51,6 +51,25 @@ def is_present(end):
     return str(end).strip().lower() == "present"
 
 
+def contact_items(data, contact):
+    """Optional contact fields in order: phone, email, LinkedIn, GitHub."""
+    items = []
+    if contact["phone"]:
+        items.append(contact["phone"])
+    if contact["email"]:
+        items.append(contact["email"])
+    if contact["homepage"]:
+        items.append(strip_scheme(contact["homepage"]))
+    items.append(strip_scheme(data["github"]))
+    return items
+
+
+def experience_dateline(e):
+    """'Start - End | City, Country' for one role, in plain text."""
+    end = "Present" if is_present(e["end"]) else e["end"]
+    return str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"]
+
+
 COUNTRY_CODE = {"Australia": "AU", "Iran": "IR"}
 
 
@@ -205,21 +224,12 @@ def render_jsonld(data, contact):
 def render_text(data, contact):
     """A plain-text résumé, laid out top to bottom for any parser."""
     out = [data["name"], data["title"], data["location"] + ", " + data["country"]]
-    row = []
-    if contact["phone"]:
-        row.append(contact["phone"])
-    if contact["email"]:
-        row.append(contact["email"])
-    if contact["homepage"]:
-        row.append(strip_scheme(contact["homepage"]))
-    row.append(strip_scheme(data["github"]))
-    out.append(" | ".join(row))
+    out.append(" | ".join(contact_items(data, contact)))
     out += ["", "SUMMARY"] + list(data["about"])
     out += ["", "EXPERIENCE"]
     for e in data["experience"]:
-        end = "Present" if is_present(e["end"]) else e["end"]
         out.append(e["role"] + ", " + e["org"])
-        out.append(str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"])
+        out.append(experience_dateline(e))
         out.append(e["summary"])
         for b in (e.get("bullets") or []):
             out.append("- " + b)
@@ -574,14 +584,7 @@ def build_docx(data, contact):
     role.font.size = Pt(9)
     role.font.color.rgb = accent
 
-    bits = [data["location"] + ", " + data["country"]]
-    if contact["phone"]:
-        bits.append(contact["phone"])
-    if contact["email"]:
-        bits.append(contact["email"])
-    if contact["homepage"]:
-        bits.append(strip_scheme(contact["homepage"]))
-    bits.append(strip_scheme(data["github"]))
+    bits = [data["location"] + ", " + data["country"]] + contact_items(data, contact)
     c = doc.add_paragraph().add_run(" | ".join(bits))
     c.font.size = Pt(9)
     c.font.color.rgb = muted
@@ -596,9 +599,8 @@ def build_docx(data, contact):
 
     doc.add_heading("Experience", level=1)
     for e in data["experience"]:
-        end = "Present" if is_present(e["end"]) else e["end"]
         doc.add_paragraph().add_run(e["role"] + ", " + e["org"]).bold = True
-        dated(str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"])
+        dated(experience_dateline(e))
         doc.add_paragraph(e["summary"])
         for b in (e.get("bullets") or []):
             doc.add_paragraph(b, style="List Bullet")
