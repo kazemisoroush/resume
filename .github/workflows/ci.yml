@@ -56,8 +56,9 @@ jobs:
           HOMEPAGE: ${{ vars.HOMEPAGE }}
         run: python3 -m pytest -q
 
-      # Downloadable on every run so the rendered PDF can be reviewed pre-merge.
+      # Downloadable on every run (even if a later test fails) for review.
       - name: Upload PDF artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: resume-pdf

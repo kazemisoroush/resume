@@ -453,8 +453,8 @@ PRINT_CSS = """
   .meta .now { color: #b0651a; }
   .sum { margin: 4pt 0 5pt; font-size: 9.4pt; line-height: 1.4; color: #3a4049; }
   ul { list-style: none; margin: 0; padding: 0; }
-  li { position: relative; padding-left: 11pt; font-size: 9.4pt; line-height: 1.38; color: #3a4049; margin-bottom: 2.5pt; }
-  li::before { content: ""; position: absolute; left: 1.5pt; top: 4.4pt; width: 3pt; height: 3pt; border: 1pt solid #b0651a; border-radius: 50%; }
+  li { padding-left: 11pt; text-indent: -11pt; font-size: 9.4pt; line-height: 1.38; color: #3a4049; margin-bottom: 2.5pt; }
+  li::before { content: ""; display: inline-block; width: 3pt; height: 3pt; border: 1pt solid #b0651a; border-radius: 50%; margin: 0 6pt 1pt 2pt; vertical-align: middle; }
   .stack { margin-top: 6pt; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.6pt; color: #6a7180; line-height: 1.6; }
   .stack b { color: #949aa6; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; margin-right: 6pt; }
   .skill { font-size: 9.4pt; color: #3a4049; margin-bottom: 3pt; }
