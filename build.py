@@ -42,6 +42,14 @@ def strip_scheme(url):
     return str(url).replace("https://", "").replace("http://", "").rstrip("/")
 
 
+def homepage_url(contact):
+    return "https://" + strip_scheme(contact["homepage"])
+
+
+def is_present(end):
+    return str(end).strip().lower() == "present"
+
+
 COUNTRY_CODE = {"Australia": "AU", "Iran": "IR"}
 
 
@@ -81,7 +89,7 @@ MONTHS = {"jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05",
 def iso_date(s):
     """'Jan 2024' -> '2024-01', '2014' -> '2014', 'Present' -> ''."""
     s = str(s).strip()
-    if s.lower() == "present":
+    if is_present(s):
         return ""
     parts = s.split()
     if len(parts) == 2 and parts[0][:3].lower() in MONTHS:
@@ -126,7 +134,7 @@ def render_json_resume(data, contact):
         basics["phone"] = contact["phone"]
     if contact["homepage"]:
         hp = strip_scheme(contact["homepage"])
-        basics["profiles"].append({"network": "LinkedIn", "url": "https://" + hp, "username": hp.split("/")[-1]})
+        basics["profiles"].append({"network": "LinkedIn", "url": homepage_url(contact), "username": hp.split("/")[-1]})
     basics["profiles"].append({"network": "GitHub", "url": data["github"], "username": strip_scheme(data["github"]).split("/")[-1]})
 
     work = []
@@ -186,9 +194,11 @@ def render_jsonld(data, contact):
     if contact["email"]:
         person["email"] = contact["email"]
     if contact["homepage"]:
-        person["sameAs"].append("https://" + strip_scheme(contact["homepage"]))
+        person["sameAs"].append(homepage_url(contact))
     person["sameAs"].append(data["github"])
-    return '<script type="application/ld+json">\n' + json.dumps(person, indent=2, ensure_ascii=False) + '\n</script>\n'
+    payload = json.dumps(person, indent=2, ensure_ascii=False)
+    payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    return '<script type="application/ld+json">\n' + payload + '\n</script>\n'
 
 
 def render_text(data, contact):
@@ -206,7 +216,7 @@ def render_text(data, contact):
     out += ["", "SUMMARY"] + list(data["about"])
     out += ["", "EXPERIENCE"]
     for e in data["experience"]:
-        end = "Present" if str(e["end"]).lower() == "present" else e["end"]
+        end = "Present" if is_present(e["end"]) else e["end"]
         out.append(e["role"] + ", " + e["org"])
         out.append(str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"])
         out.append(e["summary"])
@@ -370,7 +380,7 @@ def render_html(data, contact):
     exp0 = data["experience"][0]
     links = ['<a href="' + h(data["github"]) + '" target="_blank" rel="noopener">GitHub</a>']
     if contact["homepage"]:
-        links.append('<a href="https://' + h(strip_scheme(contact["homepage"])) + '" target="_blank" rel="noopener">LinkedIn</a>')
+        links.append('<a href="' + h(homepage_url(contact)) + '" target="_blank" rel="noopener">LinkedIn</a>')
     if contact["email"]:
         links.append('<a href="mailto:' + h(contact["email"]) + '">Email</a>')
 
@@ -400,7 +410,7 @@ def render_html(data, contact):
     p.append('    <section>\n      <div class="rule-head"><span class="label">Experience</span></div>\n')
     for e in data["experience"]:
         place = h(e["city"]) + ", " + ccode(e["country"])
-        if str(e["end"]).lower() == "present":
+        if is_present(e["end"]):
             when = '<span class="now">' + h(e["start"]) + ' — Now</span><span class="place">' + place + '</span>'
         else:
             when = h(e["start"]) + ' — ' + h(e["end"]) + '<span class="place">' + place + '</span>'
@@ -474,7 +484,7 @@ def render_print_html(data, contact, json_href="resume.json"):
         parts.append('<a href="mailto:' + h(contact["email"]) + '">' + h(contact["email"]) + '</a>')
     if contact["homepage"]:
         hp = strip_scheme(contact["homepage"])
-        parts.append('<a href="https://' + h(hp) + '">' + h(hp) + '</a>')
+        parts.append('<a href="' + h(homepage_url(contact)) + '">' + h(hp) + '</a>')
     parts.append('<a href="' + h(data["github"]) + '">' + h(strip_scheme(data["github"])) + '</a>')
     contact_line = h(data["location"]) + ", " + h(data["country"]) + "  ·  " + "  ·  ".join(parts)
 
@@ -500,7 +510,7 @@ def render_print_html(data, contact, json_href="resume.json"):
     p.append('  <section>\n    <h2>Experience</h2>\n')
     for e in data["experience"]:
         loc = h(e["city"]) + ", " + ccode(e["country"])
-        if str(e["end"]).lower() == "present":
+        if is_present(e["end"]):
             dates = '<span class="now">' + h(e["start"]) + ' — Now</span>'
         else:
             dates = h(e["start"]) + ' — ' + h(e["end"])

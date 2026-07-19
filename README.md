@@ -20,7 +20,7 @@ Edit **`content.yaml`** only. [`build.py`](build.py) renders everything from it:
 
 These formats let AI, agents, scrapers, and applicant tracking systems read the résumé as data. The PDF is a single-column, tagged document, so its text extracts in reading order.
 
-All three are generated (git-ignored). Do not edit them by hand. `portrait.jpg`
+All of these are generated (git-ignored). Do not edit them by hand. `portrait.jpg`
 is the hero photo (web only; the PDF stays photo-free).
 
 Contact details are **not** in the content. `build.py` reads `PHONE_NUMBER` /
@@ -38,8 +38,9 @@ Configure under **Settings → Secrets and variables → Actions**:
 ## How CI publishes
 
 `.github/workflows/ci.yml`, on every push to `main`: install WeasyPrint + IBM
-Plex fonts → `build.py` (generate site + PDF) → assemble `_site/` (homepage,
-`resume.pdf`, `portrait.jpg`) → deploy to GitHub Pages. Pull requests run the
+Plex fonts → `build.py` (generate the site, PDF, and data files) → run the tests
+→ assemble `_site/` (homepage, `resume.pdf`, `resume.json`, `resume.txt`,
+`llms.txt`, `portrait.jpg`) → deploy to GitHub Pages. Pull requests run the
 `build` job as a check (and upload the PDF as a downloadable artifact) but do
 not deploy.
 
@@ -48,7 +49,7 @@ not deploy.
 ```bash
 python3 -m pip install pyyaml weasyprint   # WeasyPrint needs pango/cairo (brew install pango on macOS)
 export EMAIL_ADDRESS="you@example.com" HOMEPAGE="www.linkedin.com/in/kazemisoroush"
-python3 build.py            # writes index.html, resume-print.html, resume.pdf
+python3 build.py            # writes index.html, resume.json, resume.txt, llms.txt, resume.pdf
 open index.html
 open resume.pdf
 ```
