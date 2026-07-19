@@ -6,6 +6,7 @@ content.yaml is the single source of truth. This script generates:
   - resume.json        the résumé in the JSON Resume schema
   - resume.txt         a plain-text résumé
   - llms.txt           a discovery file for AI agents
+  - resume.docx        a Word résumé (if python-docx is installed)
   - resume-print.html  a print-format document
   - resume.pdf         a tagged PDF from resume-print.html via WeasyPrint (if installed)
 
@@ -48,6 +49,25 @@ def homepage_url(contact):
 
 def is_present(end):
     return str(end).strip().lower() == "present"
+
+
+def contact_items(data, contact):
+    """Optional contact fields in order: phone, email, LinkedIn, GitHub."""
+    items = []
+    if contact["phone"]:
+        items.append(contact["phone"])
+    if contact["email"]:
+        items.append(contact["email"])
+    if contact["homepage"]:
+        items.append(strip_scheme(contact["homepage"]))
+    items.append(strip_scheme(data["github"]))
+    return items
+
+
+def experience_dateline(e):
+    """'Start - End | City, Country' for one role, in plain text."""
+    end = "Present" if is_present(e["end"]) else e["end"]
+    return str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"]
 
 
 COUNTRY_CODE = {"Australia": "AU", "Iran": "IR"}
@@ -204,21 +224,12 @@ def render_jsonld(data, contact):
 def render_text(data, contact):
     """A plain-text résumé, laid out top to bottom for any parser."""
     out = [data["name"], data["title"], data["location"] + ", " + data["country"]]
-    row = []
-    if contact["phone"]:
-        row.append(contact["phone"])
-    if contact["email"]:
-        row.append(contact["email"])
-    if contact["homepage"]:
-        row.append(strip_scheme(contact["homepage"]))
-    row.append(strip_scheme(data["github"]))
-    out.append(" | ".join(row))
+    out.append(" | ".join(contact_items(data, contact)))
     out += ["", "SUMMARY"] + list(data["about"])
     out += ["", "EXPERIENCE"]
     for e in data["experience"]:
-        end = "Present" if is_present(e["end"]) else e["end"]
         out.append(e["role"] + ", " + e["org"])
-        out.append(str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"])
+        out.append(experience_dateline(e))
         out.append(e["summary"])
         for b in (e.get("bullets") or []):
             out.append("- " + b)
@@ -312,6 +323,8 @@ SITE_CSS = """
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
   .btn { display: inline-flex; align-items: center; gap: 9px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 15px; padding: 12px 22px; border-radius: 8px; box-shadow: var(--shadow); transition: transform .16s ease, filter .16s ease; }
   .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  .btn.alt { background: transparent; color: var(--accent); border: 1px solid var(--line-strong); box-shadow: none; }
+  .btn.alt:hover { background: var(--accent-soft); filter: none; }
   .links { display: flex; flex-wrap: wrap; gap: 20px; font-family: var(--font-mono); font-size: 13.5px; }
   .links a { color: var(--muted); border-bottom: 1px solid transparent; padding-bottom: 1px; transition: color .15s ease, border-color .15s ease; }
   .links a:hover { color: var(--accent); border-color: var(--accent); }
@@ -399,6 +412,7 @@ def render_html(data, contact):
         '          <p class="meta-row anim d2">' + h(data["location"]) + ' · ' + h(data["country"]) + '</p>\n'
         '          <div class="actions anim d3">\n'
         '            <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Open PDF résumé ↗</a>\n'
+        '            <a class="btn alt" href="resume.docx">Word (.docx) ↓</a>\n'
         '            <nav class="links">' + " ".join(links) + '</nav>\n'
         '          </div>\n        </div>\n'
         '        <img class="portrait anim d2" src="' + h(data["photo"]) + '" alt="' + h(name) + '" width="172" height="215" />\n'
@@ -545,6 +559,70 @@ def render_print_html(data, contact, json_href="resume.json"):
     return "".join(p)
 
 
+# ===========================================================================
+# Word document (.docx)
+# ===========================================================================
+
+def build_docx(data, contact):
+    """Build a Word résumé as a python-docx Document, single column and in order."""
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+
+    accent = RGBColor(0xB0, 0x65, 0x1E)
+    muted = RGBColor(0x6A, 0x71, 0x80)
+    doc = Document()
+    normal = doc.styles["Normal"].font
+    normal.name = "Calibri"
+    normal.size = Pt(10.5)
+
+    name = doc.add_paragraph().add_run(data["name"])
+    name.bold = True
+    name.font.size = Pt(22)
+
+    role = doc.add_paragraph().add_run(data["eyebrow"])
+    role.bold = True
+    role.font.size = Pt(9)
+    role.font.color.rgb = accent
+
+    bits = [data["location"] + ", " + data["country"]] + contact_items(data, contact)
+    c = doc.add_paragraph().add_run(" | ".join(bits))
+    c.font.size = Pt(9)
+    c.font.color.rgb = muted
+
+    doc.add_paragraph(" ".join(data["about"]))
+
+    def dated(text):
+        run = doc.add_paragraph().add_run(text)
+        run.italic = True
+        run.font.size = Pt(9)
+        run.font.color.rgb = muted
+
+    doc.add_heading("Experience", level=1)
+    for e in data["experience"]:
+        doc.add_paragraph().add_run(e["role"] + ", " + e["org"]).bold = True
+        dated(experience_dateline(e))
+        doc.add_paragraph(e["summary"])
+        for b in (e.get("bullets") or []):
+            doc.add_paragraph(b, style="List Bullet")
+        if e.get("tech"):
+            tech = doc.add_paragraph().add_run("Tech: " + ", ".join(split_commas(e["tech"])))
+            tech.font.size = Pt(9)
+            tech.font.color.rgb = muted
+
+    doc.add_heading("Skills", level=1)
+    for sk in data["skills"]:
+        p = doc.add_paragraph()
+        p.add_run(sk["label"] + ": ").bold = True
+        p.add_run(sk["items"])
+
+    doc.add_heading("Education", level=1)
+    for ed in data["education"]:
+        doc.add_paragraph().add_run(ed["degree"] + ", " + ed["org"]).bold = True
+        dated(str(ed["start"]) + " - " + str(ed["end"]) + " | " + ed["detail"])
+
+    return doc
+
+
 def main():
     data = yaml.safe_load((HERE / "content.yaml").read_text())
     contact = read_contact()
@@ -555,14 +633,20 @@ def main():
     (HERE / "llms.txt").write_text(render_llms(data, contact))
     print_html = render_print_html(data, contact)
     (HERE / "resume-print.html").write_text(print_html)
-    made = "index.html, resume.json, resume.txt, llms.txt, resume-print.html"
+    made = ["index.html", "resume.json", "resume.txt", "llms.txt", "resume-print.html"]
+    try:
+        build_docx(data, contact).save(str(HERE / "resume.docx"))
+        made.append("resume.docx")
+    except ImportError:
+        pass
     try:
         from weasyprint import HTML
         HTML(string=print_html, base_url=str(HERE)).write_pdf(
             str(HERE / "resume.pdf"), pdf_variant="pdf/ua-1")
-        print("Generated " + made + ", resume.pdf")
+        made.append("resume.pdf")
     except ImportError:
-        print("Generated " + made + " (WeasyPrint not installed; PDF skipped)")
+        pass
+    print("Generated " + ", ".join(made))
 
 
 if __name__ == "__main__":
