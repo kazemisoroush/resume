@@ -37,17 +37,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-ibm-plex
-          python3 -m pip install --quiet weasyprint pyyaml
+          python3 -m pip install --quiet weasyprint pyyaml pypdf pytest
 
       # content.yaml is the single source of truth; render the site, the print
-      # document, and the PDF. Contact details come from repo secrets/vars at
-      # build time, never from the source; any unset value is omitted.
-      - name: Generate site and résumé PDF
+      # document, the structured data, and the PDF. Contact details come from
+      # repo secrets/vars at build time, never from the source; unset is omitted.
+      - name: Generate site and résumé files
         env:
           PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
           EMAIL_ADDRESS: ${{ vars.EMAIL_ADDRESS }}
           HOMEPAGE: ${{ vars.HOMEPAGE }}
         run: python3 build.py
+
+      - name: Test the generated outputs
+        env:
+          PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+          EMAIL_ADDRESS: ${{ vars.EMAIL_ADDRESS }}
+          HOMEPAGE: ${{ vars.HOMEPAGE }}
+        run: python3 -m pytest -q
 
       # Downloadable on every run so the rendered PDF can be reviewed pre-merge.
       - name: Upload PDF artifact
@@ -62,6 +69,9 @@ jobs:
           mkdir -p _site
           cp index.html _site/index.html
           cp resume.pdf _site/resume.pdf
+          cp resume.json _site/resume.json
+          cp resume.txt _site/resume.txt
+          cp llms.txt _site/llms.txt
           cp portrait.jpg _site/portrait.jpg
 
       - name: Configure Pages

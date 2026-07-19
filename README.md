@@ -12,9 +12,13 @@ Edit **`content.yaml`** only. [`build.py`](build.py) renders everything from it:
 
 | Output | What |
 |---|---|
-| `index.html` | the portfolio homepage |
-| `resume-print.html` | print-format document |
-| `resume.pdf` | rendered from `resume-print.html` via [WeasyPrint](https://weasyprint.org) |
+| `index.html` | the portfolio homepage, with schema.org Person data |
+| `resume.pdf` | a tagged PDF from `resume-print.html` via [WeasyPrint](https://weasyprint.org), with `resume.json` attached |
+| `resume.json` | the résumé in the [JSON Resume](https://jsonresume.org) schema |
+| `resume.txt` | a plain-text résumé |
+| `llms.txt` | a discovery file that points AI agents to the files above |
+
+These formats let AI, agents, scrapers, and applicant tracking systems read the résumé as data. The PDF is a single-column, tagged document, so its text extracts in reading order.
 
 All three are generated (git-ignored). Do not edit them by hand. `portrait.jpg`
 is the hero photo (web only; the PDF stays photo-free).
