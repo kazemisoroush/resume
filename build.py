@@ -2,9 +2,12 @@
 """Render the résumé site and PDF from content.yaml.
 
 content.yaml is the single source of truth. This script generates:
-  - index.html         the portfolio homepage (GitHub Pages)
+  - index.html         the portfolio homepage (with schema.org Person data)
+  - resume.json        the résumé in the JSON Resume schema
+  - resume.txt         a plain-text résumé
+  - llms.txt           a discovery file for AI agents
   - resume-print.html  a print-format document
-  - resume.pdf         rendered from resume-print.html via WeasyPrint (if installed)
+  - resume.pdf         a tagged PDF from resume-print.html via WeasyPrint (if installed)
 
 Contact details are read from the environment (PHONE_NUMBER / EMAIL_ADDRESS /
 HOMEPAGE) at build time, so nothing personal lives in the source. Any value that
@@ -14,6 +17,7 @@ Usage: python build.py
 """
 
 import html
+import json
 import os
 from pathlib import Path
 
@@ -38,6 +42,14 @@ def strip_scheme(url):
     return str(url).replace("https://", "").replace("http://", "").rstrip("/")
 
 
+def homepage_url(contact):
+    return "https://" + strip_scheme(contact["homepage"])
+
+
+def is_present(end):
+    return str(end).strip().lower() == "present"
+
+
 COUNTRY_CODE = {"Australia": "AU", "Iran": "IR"}
 
 
@@ -45,8 +57,196 @@ def ccode(country):
     return COUNTRY_CODE.get(country, str(country)[:2].upper())
 
 
+def split_commas(s):
+    """Split on top-level commas, keeping commas inside parentheses together."""
+    out, depth, cur = [], 0, ""
+    for ch in str(s):
+        if ch == "(":
+            depth += 1
+            cur += ch
+        elif ch == ")":
+            depth -= 1
+            cur += ch
+        elif ch == "," and depth == 0:
+            out.append(cur.strip())
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        out.append(cur.strip())
+    return out
+
+
 def stack(tech):
-    return " · ".join(t.strip() for t in str(tech).split(","))
+    return " · ".join(split_commas(tech))
+
+
+MONTHS = {"jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05",
+          "jun": "06", "jul": "07", "aug": "08", "sep": "09", "oct": "10",
+          "nov": "11", "dec": "12"}
+
+
+def iso_date(s):
+    """'Jan 2024' -> '2024-01', '2014' -> '2014', 'Present' -> ''."""
+    s = str(s).strip()
+    if is_present(s):
+        return ""
+    parts = s.split()
+    if len(parts) == 2 and parts[0][:3].lower() in MONTHS:
+        return parts[1] + "-" + MONTHS[parts[0][:3].lower()]
+    return s
+
+
+def split_location(loc):
+    """'Sydney, NSW' -> ('Sydney', 'NSW')."""
+    bits = [b.strip() for b in str(loc).split(",")]
+    return bits[0], (bits[1] if len(bits) > 1 else "")
+
+
+def skill_keywords(data):
+    kws = []
+    for sk in data["skills"]:
+        kws.extend(split_commas(sk["items"]))
+    return kws
+
+
+BASE_URL = "https://kazemisoroush.github.io/resume/"
+
+
+# ===========================================================================
+# Structured data (for AI, agents, scrapers, and ATS)
+# ===========================================================================
+
+def render_json_resume(data, contact):
+    """The résumé in the JSON Resume schema (https://jsonresume.org)."""
+    city, region = split_location(data["location"])
+    basics = {
+        "name": data["name"],
+        "label": data["title"],
+        "summary": " ".join(data["about"]),
+        "url": BASE_URL,
+        "location": {"city": city, "region": region, "countryCode": ccode(data["country"])},
+        "profiles": [],
+    }
+    if contact["email"]:
+        basics["email"] = contact["email"]
+    if contact["phone"]:
+        basics["phone"] = contact["phone"]
+    if contact["homepage"]:
+        hp = strip_scheme(contact["homepage"])
+        basics["profiles"].append({"network": "LinkedIn", "url": homepage_url(contact), "username": hp.split("/")[-1]})
+    basics["profiles"].append({"network": "GitHub", "url": data["github"], "username": strip_scheme(data["github"]).split("/")[-1]})
+
+    work = []
+    for e in data["experience"]:
+        item = {
+            "name": e["org"],
+            "position": e["role"],
+            "location": e["city"] + ", " + e["country"],
+            "startDate": iso_date(e["start"]),
+            "summary": e["summary"],
+            "highlights": list(e.get("bullets") or []),
+        }
+        end = iso_date(e["end"])
+        if end:
+            item["endDate"] = end
+        if e.get("tech"):
+            item["keywords"] = split_commas(e["tech"])
+        work.append(item)
+
+    education = [{
+        "institution": ed["org"],
+        "studyType": ed["degree"],
+        "area": ed["detail"],
+        "startDate": iso_date(ed["start"]),
+        "endDate": iso_date(ed["end"]),
+        "location": ed["city"] + ", " + ed["country"],
+    } for ed in data["education"]]
+
+    skills = [{"name": sk["label"], "keywords": split_commas(sk["items"])} for sk in data["skills"]]
+
+    resume = {
+        "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+        "basics": basics,
+        "work": work,
+        "education": education,
+        "skills": skills,
+        "meta": {"canonical": BASE_URL + "resume.json", "version": "1.0.0"},
+    }
+    return json.dumps(resume, indent=2, ensure_ascii=False) + "\n"
+
+
+def render_jsonld(data, contact):
+    """A schema.org Person block for the homepage."""
+    city, region = split_location(data["location"])
+    person = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": data["name"],
+        "jobTitle": data["title"],
+        "worksFor": {"@type": "Organization", "name": data["experience"][0]["org"]},
+        "address": {"@type": "PostalAddress", "addressLocality": city, "addressRegion": region, "addressCountry": ccode(data["country"])},
+        "url": BASE_URL,
+        "alumniOf": {"@type": "CollegeOrUniversity", "name": data["education"][0]["org"]},
+        "knowsAbout": skill_keywords(data),
+        "sameAs": [],
+    }
+    if contact["email"]:
+        person["email"] = contact["email"]
+    if contact["homepage"]:
+        person["sameAs"].append(homepage_url(contact))
+    person["sameAs"].append(data["github"])
+    payload = json.dumps(person, indent=2, ensure_ascii=False)
+    payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    return '<script type="application/ld+json">\n' + payload + '\n</script>\n'
+
+
+def render_text(data, contact):
+    """A plain-text résumé, laid out top to bottom for any parser."""
+    out = [data["name"], data["title"], data["location"] + ", " + data["country"]]
+    row = []
+    if contact["phone"]:
+        row.append(contact["phone"])
+    if contact["email"]:
+        row.append(contact["email"])
+    if contact["homepage"]:
+        row.append(strip_scheme(contact["homepage"]))
+    row.append(strip_scheme(data["github"]))
+    out.append(" | ".join(row))
+    out += ["", "SUMMARY"] + list(data["about"])
+    out += ["", "EXPERIENCE"]
+    for e in data["experience"]:
+        end = "Present" if is_present(e["end"]) else e["end"]
+        out.append(e["role"] + ", " + e["org"])
+        out.append(str(e["start"]) + " - " + str(end) + " | " + e["city"] + ", " + e["country"])
+        out.append(e["summary"])
+        for b in (e.get("bullets") or []):
+            out.append("- " + b)
+        if e.get("tech"):
+            out.append("Tech: " + ", ".join(split_commas(e["tech"])))
+        out.append("")
+    out.append("SKILLS")
+    for sk in data["skills"]:
+        out.append(sk["label"] + ": " + sk["items"])
+    out += ["", "EDUCATION"]
+    for ed in data["education"]:
+        out.append(ed["degree"] + ", " + ed["org"])
+        out.append(str(ed["start"]) + " - " + str(ed["end"]) + " | " + ed["detail"])
+    return "\n".join(out).rstrip() + "\n"
+
+
+def render_llms(data, contact):
+    """An llms.txt so AI agents can find the structured résumé."""
+    exp0 = data["experience"][0]
+    out = ["# " + data["name"] + ", " + data["title"], "",
+           exp0["role"] + " at " + exp0["org"] + ", based in " + data["location"] + ", " + data["country"] + ".",
+           "", "## Résumé files",
+           "- [PDF](" + BASE_URL + "resume.pdf)",
+           "- [JSON Resume](" + BASE_URL + "resume.json)",
+           "- [Plain text](" + BASE_URL + "resume.txt)",
+           "- [Homepage](" + BASE_URL + ")",
+           "", "## Summary"] + list(data["about"])
+    return "\n".join(out) + "\n"
 
 
 # ===========================================================================
@@ -180,7 +380,7 @@ def render_html(data, contact):
     exp0 = data["experience"][0]
     links = ['<a href="' + h(data["github"]) + '" target="_blank" rel="noopener">GitHub</a>']
     if contact["homepage"]:
-        links.append('<a href="https://' + h(strip_scheme(contact["homepage"])) + '" target="_blank" rel="noopener">LinkedIn</a>')
+        links.append('<a href="' + h(homepage_url(contact)) + '" target="_blank" rel="noopener">LinkedIn</a>')
     if contact["email"]:
         links.append('<a href="mailto:' + h(contact["email"]) + '">Email</a>')
 
@@ -188,7 +388,7 @@ def render_html(data, contact):
          '<meta charset="utf-8" />\n<meta name="viewport" content="width=device-width, initial-scale=1" />\n'
          '<title>' + h(name) + ', ' + h(title) + '</title>\n'
          '<meta name="description" content="' + h(name) + ', ' + h(title) + ', based in ' + h(data["location"]) + '. Résumé and portfolio." />\n'
-         '<style>' + SITE_CSS + '</style>\n</head>\n<body>\n']
+         '<style>' + SITE_CSS + '</style>\n' + render_jsonld(data, contact) + '</head>\n<body>\n']
     p.append('<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle colour theme"></button>\n\n')
     p.append('  <div class="wrap">\n')
     p.append(
@@ -210,7 +410,7 @@ def render_html(data, contact):
     p.append('    <section>\n      <div class="rule-head"><span class="label">Experience</span></div>\n')
     for e in data["experience"]:
         place = h(e["city"]) + ", " + ccode(e["country"])
-        if str(e["end"]).lower() == "present":
+        if is_present(e["end"]):
             when = '<span class="now">' + h(e["start"]) + ' — Now</span><span class="place">' + place + '</span>'
         else:
             when = h(e["start"]) + ' — ' + h(e["end"]) + '<span class="place">' + place + '</span>'
@@ -249,88 +449,96 @@ PRINT_CSS = """
   @page { size: A4; margin: 15mm 15mm 13mm; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; color: #15181f; font-size: 10.2pt; line-height: 1.42; }
-  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16pt; }
-  h1 { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-weight: 600; font-size: 25pt; line-height: 1; letter-spacing: -0.01em; margin: 0; }
+  a { color: #6a7180; text-decoration: underline; text-decoration-color: #bfc4cc; }
+  h1 { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-weight: 600; font-size: 25pt; line-height: 1.05; letter-spacing: -0.01em; margin: 0; }
   .role { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: #b0651a; margin: 6pt 0 0; font-weight: 500; }
-  .contact { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; line-height: 1.7; color: #6a7180; text-align: right; }
-  .contact div a { color: #6a7180; text-decoration: underline; text-decoration-color: #bfc4cc; text-underline-offset: 2px; }
-  .hr { height: 1.6pt; background: #b0651a; margin: 9pt 0 0; }
+  .contact { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8pt; line-height: 1.6; color: #6a7180; margin: 7pt 0 0; }
+  .hr { height: 1.6pt; background: #b0651a; margin: 9pt 0 0; border: 0; }
   .summary { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 10.5pt; line-height: 1.45; color: #3a4049; margin: 11pt 0 0; }
-  section { margin-top: 13pt; }
-  .slabel { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8pt; letter-spacing: .2em; text-transform: uppercase; color: #6a7180; font-weight: 600; border-bottom: 0.6pt solid #d3d8df; padding-bottom: 5pt; margin-bottom: 9pt; break-after: avoid; }
-  .entry { display: grid; grid-template-columns: 92pt 1fr; gap: 2pt 16pt; margin-bottom: 10pt; break-inside: avoid; }
-  .when { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; color: #6a7180; line-height: 1.5; padding-top: 2pt; }
-  .when .now { color: #b0651a; }
-  .when .loc { display: block; color: #949aa6; margin-top: 1pt; }
-  .role2 { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 11.5pt; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
-  .role2 .org { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 9.5pt; color: #6a7180; }
-  .role2 .org::before { content: "·  "; color: #949aa6; }
-  .sum { margin: 3pt 0 5pt; font-size: 9.4pt; line-height: 1.4; color: #3a4049; }
+  h2 { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8pt; letter-spacing: .2em; text-transform: uppercase; color: #6a7180; font-weight: 600; border-bottom: 0.6pt solid #d3d8df; padding-bottom: 5pt; margin: 15pt 0 9pt; break-after: avoid; }
+  .entry { margin-bottom: 10pt; break-inside: avoid; }
+  h3 { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 11.5pt; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  h3 .org { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 9.5pt; color: #6a7180; }
+  .meta { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; color: #6a7180; margin: 2pt 0 0; }
+  .meta .now { color: #b0651a; }
+  .sum { margin: 4pt 0 5pt; font-size: 9.4pt; line-height: 1.4; color: #3a4049; }
   ul { list-style: none; margin: 0; padding: 0; }
-  li { position: relative; padding-left: 11pt; font-size: 9.4pt; line-height: 1.38; color: #3a4049; margin-bottom: 2.5pt; }
-  li::before { content: ""; position: absolute; left: 1.5pt; top: 4.4pt; width: 3pt; height: 3pt; border: 1pt solid #b0651a; border-radius: 50%; }
-  .stack { margin-top: 5pt; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.6pt; color: #6a7180; line-height: 1.6; }
+  li { padding-left: 11pt; text-indent: -11pt; font-size: 9.4pt; line-height: 1.38; color: #3a4049; margin-bottom: 2.5pt; }
+  li::before { content: ""; display: inline-block; width: 3pt; height: 3pt; border: 1pt solid #b0651a; border-radius: 50%; margin: 0 6pt 1pt 2pt; vertical-align: middle; }
+  .stack { margin-top: 6pt; font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.6pt; color: #6a7180; line-height: 1.6; }
   .stack b { color: #949aa6; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; margin-right: 6pt; }
-  .kv { display: grid; grid-template-columns: 92pt 1fr; gap: 3pt 16pt; margin-bottom: 6pt; break-inside: avoid; }
-  .kv .k { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; text-transform: uppercase; letter-spacing: .1em; color: #6a7180; padding-top: 1pt; }
-  .kv .v { font-size: 9.4pt; color: #3a4049; }
-  .kv .v .deg { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 10.5pt; font-weight: 600; color: #15181f; }
-  .kv .v .sub { color: #6a7180; font-size: 9pt; }
+  .skill { font-size: 9.4pt; color: #3a4049; margin-bottom: 3pt; }
+  .skill b { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; text-transform: uppercase; letter-spacing: .08em; color: #6a7180; font-weight: 600; margin-right: 7pt; }
+  .edu { margin-bottom: 7pt; break-inside: avoid; }
+  .edu .deg { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: 10.5pt; font-weight: 600; color: #15181f; }
+  .edu .meta2 { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 7.8pt; color: #6a7180; margin: 1pt 0 0; }
 """
 
 
-def render_print_html(data, contact):
+def render_print_html(data, contact, json_href="resume.json"):
     name = data["name"]
-    lines = ['<div>' + h(data["location"]) + ' · ' + h(data["country"]) + '</div>']
+    parts = []
     if contact["phone"]:
-        lines.append('<div>' + h(contact["phone"]) + '</div>')
+        parts.append(h(contact["phone"]))
     if contact["email"]:
-        lines.append('<div><a href="mailto:' + h(contact["email"]) + '">' + h(contact["email"]) + '</a></div>')
+        parts.append('<a href="mailto:' + h(contact["email"]) + '">' + h(contact["email"]) + '</a>')
     if contact["homepage"]:
         hp = strip_scheme(contact["homepage"])
-        lines.append('<div><a href="https://' + h(hp) + '">' + h(hp) + '</a></div>')
-    lines.append('<div><a href="' + h(data["github"]) + '">' + h(strip_scheme(data["github"])) + '</a></div>')
+        parts.append('<a href="' + h(homepage_url(contact)) + '">' + h(hp) + '</a>')
+    parts.append('<a href="' + h(data["github"]) + '">' + h(strip_scheme(data["github"])) + '</a>')
+    contact_line = h(data["location"]) + ", " + h(data["country"]) + "  ·  " + "  ·  ".join(parts)
 
     summary = " ".join(data["about"])
+    keywords = h(", ".join(skill_keywords(data)))
+    exp0 = data["experience"][0]
+    desc = h(name) + ", " + h(data["title"]) + ", " + h(exp0["role"]) + " at " + h(exp0["org"]) + "."
 
     p = ['<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8" />\n'
-         '<title>' + h(name) + ' , Résumé</title>\n<style>' + PRINT_CSS + '</style>\n</head>\n<body>\n']
-    p.append('  <div class="top">\n    <div>\n      <h1>' + h(name) + '</h1>\n'
-             '      <p class="role">' + h(data["eyebrow"]) + '</p>\n    </div>\n'
-             '    <div class="contact">\n      ' + "\n      ".join(lines) + '\n    </div>\n  </div>\n'
-             '  <div class="hr"></div>\n')
+         '<title>' + h(name) + ' Résumé</title>\n'
+         '<meta name="author" content="' + h(name) + '" />\n'
+         '<meta name="description" content="' + desc + '" />\n'
+         '<meta name="keywords" content="' + keywords + '" />\n'
+         '<meta name="generator" content="build.py" />\n'
+         '<link rel="attachment" href="' + h(json_href) + '" title="resume.json" />\n'
+         '<style>' + PRINT_CSS + '</style>\n</head>\n<body>\n']
+    p.append('  <header>\n    <h1>' + h(name) + '</h1>\n'
+             '    <p class="role">' + h(data["eyebrow"]) + '</p>\n'
+             '    <p class="contact">' + contact_line + '</p>\n  </header>\n'
+             '  <hr class="hr" />\n')
     p.append('  <p class="summary">' + h(summary) + '</p>\n')
 
-    p.append('  <section>\n    <div class="slabel">Experience</div>\n')
+    p.append('  <section>\n    <h2>Experience</h2>\n')
     for e in data["experience"]:
         loc = h(e["city"]) + ", " + ccode(e["country"])
-        if str(e["end"]).lower() == "present":
-            when = '<span class="now">' + h(e["start"]) + ' — Now</span><span class="loc">' + loc + '</span>'
+        if is_present(e["end"]):
+            dates = '<span class="now">' + h(e["start"]) + ' — Now</span>'
         else:
-            when = h(e["start"]) + ' — ' + h(e["end"]) + '<span class="loc">' + loc + '</span>'
-        p.append('    <div class="entry">\n      <div class="when">' + when + '</div>\n      <div>\n'
-                 '        <p class="role2">' + h(e["role"]) + '<span class="org">' + h(e["org"]) + '</span></p>\n'
-                 '        <p class="sum">' + h(e["summary"]) + '</p>\n')
+            dates = h(e["start"]) + ' — ' + h(e["end"])
+        p.append('    <article class="entry">\n'
+                 '      <h3>' + h(e["role"]) + '<span class="org">, ' + h(e["org"]) + '</span></h3>\n'
+                 '      <p class="meta">' + dates + '  ·  ' + loc + '</p>\n'
+                 '      <p class="sum">' + h(e["summary"]) + '</p>\n')
         if e.get("bullets"):
-            p.append('        <ul>\n')
+            p.append('      <ul>\n')
             for b in e["bullets"]:
-                p.append('          <li>' + h(b) + '</li>\n')
-            p.append('        </ul>\n')
+                p.append('        <li>' + h(b) + '</li>\n')
+            p.append('      </ul>\n')
         if e.get("tech"):
-            p.append('        <p class="stack"><b>Stack</b>' + h(stack(e["tech"])) + '</p>\n')
-        p.append('      </div>\n    </div>\n')
+            p.append('      <p class="stack"><b>Stack</b>' + h(stack(e["tech"])) + '</p>\n')
+        p.append('    </article>\n')
     p.append('  </section>\n')
 
-    p.append('  <section>\n    <div class="slabel">Skills</div>\n')
+    p.append('  <section>\n    <h2>Skills</h2>\n')
     for sk in data["skills"]:
-        p.append('    <div class="kv"><div class="k">' + h(sk["label"]) + '</div><div class="v">' + h(sk["items"]) + '</div></div>\n')
+        p.append('    <p class="skill"><b>' + h(sk["label"]) + '</b>' + h(sk["items"]) + '</p>\n')
     p.append('  </section>\n')
 
-    p.append('  <section>\n    <div class="slabel">Education</div>\n')
+    p.append('  <section>\n    <h2>Education</h2>\n')
     for ed in data["education"]:
-        p.append('    <div class="kv"><div class="k">' + h(ed["start"]) + ' — ' + h(ed["end"]) + '</div>'
-                 '<div class="v"><span class="deg">' + h(ed["degree"]) + '</span> '
-                 '<span class="sub">' + h(ed["org"]) + ' · ' + h(ed["detail"]) + '</span></div></div>\n')
+        p.append('    <div class="edu">\n'
+                 '      <span class="deg">' + h(ed["degree"]) + '</span>, ' + h(ed["org"]) + '\n'
+                 '      <p class="meta2">' + h(ed["start"]) + ' — ' + h(ed["end"]) + '  ·  ' + h(ed["detail"]) + '</p>\n'
+                 '    </div>\n')
     p.append('  </section>\n')
 
     p.append('</body>\n</html>\n')
@@ -341,14 +549,20 @@ def main():
     data = yaml.safe_load((HERE / "content.yaml").read_text())
     contact = read_contact()
     (HERE / "index.html").write_text(render_html(data, contact))
+    # resume.json is written first so the PDF can attach it.
+    (HERE / "resume.json").write_text(render_json_resume(data, contact))
+    (HERE / "resume.txt").write_text(render_text(data, contact))
+    (HERE / "llms.txt").write_text(render_llms(data, contact))
     print_html = render_print_html(data, contact)
     (HERE / "resume-print.html").write_text(print_html)
+    made = "index.html, resume.json, resume.txt, llms.txt, resume-print.html"
     try:
         from weasyprint import HTML
-        HTML(string=print_html, base_url=str(HERE)).write_pdf(str(HERE / "resume.pdf"))
-        print("Generated index.html, resume-print.html, resume.pdf")
+        HTML(string=print_html, base_url=str(HERE)).write_pdf(
+            str(HERE / "resume.pdf"), pdf_variant="pdf/ua-1")
+        print("Generated " + made + ", resume.pdf")
     except ImportError:
-        print("Generated index.html, resume-print.html (WeasyPrint not installed; PDF skipped)")
+        print("Generated " + made + " (WeasyPrint not installed; PDF skipped)")
 
 
 if __name__ == "__main__":
