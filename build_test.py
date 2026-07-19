@@ -70,3 +70,19 @@ def test_pdf_reads_top_to_bottom():
     assert i_macquarie != -1 and i_macquarie_bullet != -1 and i_evergen != -1
     assert i_macquarie < i_macquarie_bullet < i_evergen, \
         "the Macquarie bullet must sit under Macquarie and before Evergen"
+
+
+def test_docx_has_sections_and_reads_in_order():
+    docx_path = HERE / "resume.docx"
+    if not docx_path.exists():
+        pytest.skip("resume.docx not generated (python-docx not installed)")
+    from docx import Document
+    text = "\n".join(p.text for p in Document(str(docx_path)).paragraphs)
+    for token in ("Experience", "Skills", "Education", "Macquarie Group", "Senior Manager"):
+        assert token in text
+    i_role = text.find("Senior Manager")
+    i_bullet = text.find("Led the design and delivery")
+    i_evergen = text.find("Lead Software Engineer")
+    assert i_role != -1 and i_bullet != -1 and i_evergen != -1
+    assert i_role < i_bullet < i_evergen, \
+        "the Macquarie bullet must sit under Macquarie and before Evergen"

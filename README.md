@@ -14,6 +14,7 @@ Edit **`content.yaml`** only. [`build.py`](build.py) renders everything from it:
 |---|---|
 | `index.html` | the portfolio homepage, with schema.org Person data |
 | `resume.pdf` | a tagged PDF from `resume-print.html` via [WeasyPrint](https://weasyprint.org), with `resume.json` attached |
+| `resume.docx` | a Word résumé via [python-docx](https://python-docx.readthedocs.io) |
 | `resume.json` | the résumé in the [JSON Resume](https://jsonresume.org) schema |
 | `resume.txt` | a plain-text résumé |
 | `llms.txt` | a discovery file that points AI agents to the files above |
@@ -38,18 +39,19 @@ Configure under **Settings → Secrets and variables → Actions**:
 ## How CI publishes
 
 `.github/workflows/ci.yml`, on every push to `main`: install WeasyPrint + IBM
-Plex fonts → `build.py` (generate the site, PDF, and data files) → run the tests
-→ assemble `_site/` (homepage, `resume.pdf`, `resume.json`, `resume.txt`,
-`llms.txt`, `portrait.jpg`) → deploy to GitHub Pages. Pull requests run the
+Plex fonts → `build.py` (generate the site, PDF, Word file, and data files) →
+run the tests → assemble `_site/` (homepage, `resume.pdf`, `resume.docx`,
+`resume.json`, `resume.txt`, `llms.txt`, `portrait.jpg`) → deploy to GitHub
+Pages. Pull requests run the
 `build` job as a check (and upload the PDF as a downloadable artifact) but do
 not deploy.
 
 ## Build locally
 
 ```bash
-python3 -m pip install pyyaml weasyprint   # WeasyPrint needs pango/cairo (brew install pango on macOS)
+python3 -m pip install pyyaml weasyprint python-docx   # WeasyPrint needs pango/cairo (brew install pango on macOS)
 export EMAIL_ADDRESS="you@example.com" HOMEPAGE="www.linkedin.com/in/kazemisoroush"
-python3 build.py            # writes index.html, resume.json, resume.txt, llms.txt, resume.pdf
+python3 build.py            # writes index.html, resume.json/txt, llms.txt, resume.docx, resume.pdf
 open index.html
 open resume.pdf
 ```

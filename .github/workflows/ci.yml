@@ -37,7 +37,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-ibm-plex
-          python3 -m pip install --quiet weasyprint pyyaml pypdf pytest
+          python3 -m pip install --quiet weasyprint pyyaml pypdf pytest python-docx
 
       # content.yaml is the single source of truth; render the site, the print
       # document, the structured data, and the PDF. Contact details come from
@@ -70,6 +70,7 @@ jobs:
           mkdir -p _site
           cp index.html _site/index.html
           cp resume.pdf _site/resume.pdf
+          cp resume.docx _site/resume.docx
           cp resume.json _site/resume.json
           cp resume.txt _site/resume.txt
           cp llms.txt _site/llms.txt
